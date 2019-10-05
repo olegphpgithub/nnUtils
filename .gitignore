@@ -8,6 +8,13 @@
 *.so
 *.dll
 *.dylib
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.ncb
+*.qmake.stash
 
 # Qt-es
 object_script.*.Release
