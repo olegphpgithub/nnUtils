@@ -55,7 +55,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+      <widget class="QPlainTextEdit" name="protocolPlainTextEdit"/>
      </item>
     </layout>
    </item>

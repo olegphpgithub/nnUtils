@@ -55,6 +55,20 @@ QStringList FormStreamEditor::getFilesListToProcess()
     return filesList;
 }
 
+QString FormStreamEditor::GetRandomString(unsigned int randomStringLength)
+{
+   const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+
+   QString randomString;
+   for(unsigned int i=0; i<randomStringLength; ++i)
+   {
+       int index = qrand() % possibleCharacters.length();
+       QChar nextChar = possibleCharacters.at(index);
+       randomString.append(nextChar);
+   }
+   return randomString;
+}
+
 void FormStreamEditor::AddStream()
 {
     try {
@@ -77,22 +91,22 @@ void FormStreamEditor::AddStream()
             fileStreamNameString =
                     fileStreamNameString.arg("Zone.Identifier:$DATA");
             QFile file(fileStreamNameString);
-            if(file.open(QIODevice::ReadWrite | QIODevice::Text))
+            if(file.open(QIODevice::WriteOnly | QIODevice::Text))
             {
                 QFileInfo fileInfo(filePathString);
                 QString fileNameString(fileInfo.fileName());
-                QString hostUrlString("%1/%2");
-                hostUrlString = hostUrlString.arg("HostUrl=https://korzuno.s3.eu-north-1.amazonaws.com");
+                QString hostUrlString("HostUrl=https://%1.amazonaws.com/%2");
+                QString randomString = GetRandomString(12);
+                hostUrlString = hostUrlString.arg(randomString);
                 hostUrlString = hostUrlString.arg(fileNameString);
                 QTextStream outputTextStream(&file);
-                outputTextStream << "[ZoneTransfer]\r\n";
-                outputTextStream << "ZoneId=3\r\n";
-                outputTextStream << "ReferrerUrl=https://korzuno.s3.eu-north-1.amazonaws.com/index.html\r\n";
-                outputTextStream << hostUrlString << "\r\n";
-                QMessageBox::critical(this, tr("Critical Error"), hostUrlString, QMessageBox::Cancel);
+                outputTextStream << "[ZoneTransfer]" << "\n";
+                outputTextStream << "ZoneId=3" << "\n";
+                // outputTextStream << "ReferrerUrl=https://korzuno.s3.eu-north-1.amazonaws.com/index.html" << "\n";
+                outputTextStream << hostUrlString << "\n";
             }
         }
-
+        ui->protocolPlainTextEdit->appendPlainText(tr("The operation is completed."));
     } catch(QString *exception) {
         QMessageBox::critical(this, tr("Critical Error"), *exception, QMessageBox::Cancel);
         delete exception;

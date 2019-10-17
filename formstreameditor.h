@@ -17,11 +17,12 @@ public:
 
 public slots:
     void ChoosePathToExeFiles();
-    QStringList getFilesListToProcess();
     void AddStream();
 
 private:
     Ui::FormStreamEditor *ui;
+    QStringList getFilesListToProcess();
+    QString GetRandomString(unsigned int randomStringLength);
 };
 
 #endif // FORMSTREAMEDITOR_H
