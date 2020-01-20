@@ -16,15 +16,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    fileutility.cpp \
+    formfileutility.cpp \
     formstreameditor.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    fileutility.h \
+    formfileutility.h \
     formstreameditor.h \
     mainwindow.h
 
 FORMS += \
+    formfileutility.ui \
     formstreameditor.ui \
     mainwindow.ui
 
