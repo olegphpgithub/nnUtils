@@ -33,7 +33,7 @@
      <item>
       <widget class="QPushButton" name="lockFilePushButton">
        <property name="text">
-        <string>PushButton</string>
+        <string>Lock file</string>
        </property>
       </widget>
      </item>

@@ -14,8 +14,29 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile_utilities">
+    <property name="title">
+     <string>File utilities</string>
+    </property>
+    <addaction name="actionLock_file"/>
+   </widget>
+   <addaction name="menuFile_utilities"/>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLock_file">
+   <property name="text">
+    <string>Lock file</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
