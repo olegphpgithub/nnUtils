@@ -1,9 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>FormDomainUtilities</class>
- <widget name="FormDomainUtilities" class="QWidget">
+ <widget class="QWidget" name="FormDomainUtilities">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +13,43 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="centralWidget">
+     <item>
+      <widget class="QLabel" name="domainNameLabel">
+       <property name="text">
+        <string>Domain name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="domainNameLineEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="domainKeyLabel">
+       <property name="text">
+        <string>Domain key</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="domainKeyLineEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="validateDomainPushButton">
+       <property name="text">
+        <string>Validate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTextEdit" name="resultTextEdit"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>
