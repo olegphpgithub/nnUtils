@@ -94,9 +94,8 @@ public:
 	bool        CheckDomainConnection();
 	bool        CheckDomainConnectionAndSSL(bool& SSLSuccess);
 	
-    std::string cxrMainDomain;
-    std::string cxrReportUrlA;
-    std::string cxrReportUrlB;
+    std::string m_DomainName;
+    std::string m_DomainKey;
 
 	std::string m_action;
 	std::string m_UID;

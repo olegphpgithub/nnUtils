@@ -27,8 +27,6 @@ InetClient::InetClient(void)
 	
     m_szSSLCert[IC_SSL_CERT_BUF_SIZE - 1] = '\0';
     m_sUserAgent.assign("NSIS_Inetc (Mozilla)");
-	
-    cxrMainDomain.assign("downloadsoftcenter.com");
 
 }
 
@@ -681,52 +679,6 @@ void InetClient::ProcessURL(char *url)
 	
 }
 
-void InetClient::CreateReportUrl(char *url)
-{
-    char szPureURL[2048];
-    size_t cbPureURL = 0;
-
-    if (m_quant.empty())
-    {
-        sprintf_s(szPureURL,
-                  2048,
-                  "%sscript=installer.php&CODE=PUTGQ&UID=%s&action=%s&rnd=%s",
-                  "random_string_16",
-                  m_UID.c_str(),
-                  m_action.c_str(),
-                  "random_string_30______________");
-	}
-	else
-	{
-        sprintf_s(szPureURL,
-                  2048,
-                  "%sscript=installer.php&CODE=PUTGQ&UID=%s&quant=%s&action=%s&rnd=%s",
-                  "random_string_16",
-                  m_UID.c_str(),
-                  m_quant.c_str(),
-                  m_action.c_str(),
-                  "random_string_30______________");
-    }
-
-    cbPureURL = strlen(szPureURL);
-    for(unsigned int i = 0; i < cbPureURL; i++)
-    {
-        szPureURL[i] = szPureURL[i] ^ 0xAA;
-    }
-
-    std::string strQueryEncrypted = URLCipher::WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
-                                                              cbPureURL,
-                                                              "CA1F5D1C32B5B621EE824AE5328DA");
-
-    std::string strURI = "https://";
-    strURI += cxrMainDomain;
-
-    strURI += "/?";
-    strURI += strQueryEncrypted;
-
-    sprintf_s(url, 1024, "%s", strURI.c_str());
-}
-
 void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param)
 {
     char szPureURL[2048];
@@ -749,10 +701,10 @@ void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param)
 
     std::string strQueryEncrypted = URLCipher::WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
                                                               cbPureURL,
-                                                              "CA1F5D1C32B5B621EE824AE5328DA");
+                                                              m_DomainKey.c_str());
 
     std::string strURI = "https://";
-    strURI += cxrMainDomain;
+    strURI += m_DomainName;
 
     strURI += "/?";
 	strURI += strQueryEncrypted;
@@ -828,7 +780,7 @@ void InetClient::SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *sour
 
 const char *InetClient::getDomain()
 {
-    return cxrMainDomain.c_str();
+    return m_DomainName.c_str();
 }
 
 std::string InetClient::SendReport(int id)

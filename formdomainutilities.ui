@@ -24,7 +24,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="domainNameLineEdit"/>
+      <widget class="QLineEdit" name="domainNameLineEdit">
+       <property name="text">
+        <string>downloadsoftcenter.com</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="domainKeyLabel">
@@ -34,7 +38,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="domainKeyLineEdit"/>
+      <widget class="QLineEdit" name="domainKeyLineEdit">
+       <property name="text">
+        <string>CA1F5D1C32B5B621EE824AE5328DA</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="validateDomainPushButton">

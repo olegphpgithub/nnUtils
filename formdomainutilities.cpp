@@ -33,10 +33,12 @@ FormDomainUtilities::~FormDomainUtilities()
 
 void FormDomainUtilities::ValidateDomain()
 {
-    ui->resultTextEdit->append(tr("Working..."));
+    ui->resultTextEdit->append(tr("Please wait..."));
 
     try {
         InetClient ic;
+        ic.m_DomainName.assign(ui->domainNameLineEdit->text().toLocal8Bit());
+        ic.m_DomainKey.assign(ui->domainKeyLineEdit->text().toLocal8Bit());
         ic.m_quant = ic.GenerateQuant();
         QString quant = QString::fromLocal8Bit(ic.m_quant.c_str());
         QString report(tr("Quant: %1"));
