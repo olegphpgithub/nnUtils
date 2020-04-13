@@ -1,6 +1,8 @@
+#include <tchar.h>
 #include <Windows.h>
 
 #include "InetClient.h"
+#include "CppException.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -8,7 +10,6 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
-
 
 #include <WinInet.h>
 #include <Winineti.h>
@@ -29,25 +30,6 @@ InetClient::InetClient(void)
 	
     cxrMainDomain.assign("downloadsoftcenter.com");
 
-
-    GUID guid;
-    char buff[0x100];
-    std::string squant;
-    CoCreateGuid(&guid);
-    sprintf_s(buff,
-              "%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
-              guid.Data1,
-              guid.Data2,
-              guid.Data3,
-              guid.Data4[0],
-              guid.Data4[1],
-              guid.Data4[2],
-              guid.Data4[3],
-              guid.Data4[4],
-              guid.Data4[5],
-              guid.Data4[6],
-              guid.Data4[7]);
-    m_UID = buff;
 }
 
 InetClient::~InetClient(void)
@@ -844,17 +826,6 @@ void InetClient::SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *sour
 	}
 }
 
-std::string InetClient::GenerateGuid()
-{
-	GUID guid;
-	HRESULT hCreateGuid = CoCreateGuid(&guid);
-    char szBuf[256];
-
-    sprintf_s(szBuf, 256, "%08lX%04hX%04hX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
-	
-	return std::string(szBuf);
-}
-
 const char *InetClient::getDomain()
 {
     return cxrMainDomain.c_str();
@@ -976,6 +947,7 @@ bool InetClient::CheckSSLCertificate(int action)
 	
 	return false;
 }
+
 bool InetClient::CheckDomainConnectionAndSSL(bool& SSLSuccess)
 {
 	SSLSuccess = false;
@@ -1030,4 +1002,75 @@ bool InetClient::CheckDomainConnectionAndSSL(bool& SSLSuccess)
 	}
 
 	return true;
+}
+
+
+std::string InetClient::GenerateGuid() throw(CppException*)
+{
+    GUID guid;
+    HRESULT hCreateGuid = CoCreateGuid(&guid);
+    if(hCreateGuid != ERROR_SUCCESS)
+    {
+        throw new CppException(TEXT("CoCreateGuid failed"), GetLastError());
+    }
+
+    char szBuf[256];
+
+    sprintf_s(szBuf,
+              256,
+              "%08lX%04hX%04hX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
+              guid.Data1,
+              guid.Data2,
+              guid.Data3,
+              guid.Data4[0],
+              guid.Data4[1],
+              guid.Data4[2],
+              guid.Data4[3],
+              guid.Data4[4],
+              guid.Data4[5],
+              guid.Data4[6],
+              guid.Data4[7]);
+
+    return std::string(szBuf);
+}
+
+
+std::string InetClient::GenerateQuant() throw(CppException*)
+{
+    try {
+        InetClient::GenerateGuid();
+
+        __int64 iQuant = 1234567890;
+        char buff[0x100];
+
+        std::string squant = SendReport(1u);
+
+        if (squant.empty())
+        {
+            throw new CppException(TEXT("Request with action '1' returned empty string"), 1);
+        }
+
+        if ( squant.length() > 16 || squant.length() < 3 )
+        {
+            throw new CppException(TEXT("Response string must be grather than 3 and less than 16"), 1);
+        }
+
+        iQuant =_atoi64(squant.c_str());
+        __int64 dig2 = iQuant %100;
+        if (dig2 < 26) { iQuant = iQuant + 8923 - dig2 *3;}
+        else {
+            if (dig2 < 51) { iQuant = iQuant + dig2 *4;}
+            else {
+                if (dig2 < 76) { iQuant = iQuant + dig2*3 - 5;}
+                else { iQuant = iQuant - dig2 + 10000;}
+            }
+        }
+
+        sprintf_s(buff, 0x100, "%lld", iQuant);
+        return std::string(buff);
+    } catch(CppException *ex) {
+        TCHAR szMessage[1024];
+        _stprintf_s(szMessage, 1024, TEXT("GenerateQuant failed: %s"), ex->wcError);
+        throw new CppException(szMessage, ex->herr);
+    }
 }

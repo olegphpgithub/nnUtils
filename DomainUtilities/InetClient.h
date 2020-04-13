@@ -56,6 +56,9 @@ namespace std
 };
 */
 
+
+#include "../CppException.h"
+
 class InetClient
 {
 public:
@@ -73,11 +76,10 @@ public:
     POST
 	};
 	
-	std::string  GenerateGuid();
+    std::string GenerateGuid() throw(CppException*);
+    std::string GenerateQuant() throw(CppException*);
 	const char  *getDomain();
-	
-	// ! ProcessURL is dangerous -- it assumes input buffer is of 1024 bytes, otherwise it can cause overflow:
-	// Processes obfuscated URL, uses CreateReportUrl and CreateRawUrl helpers:
+
 	void ProcessURL(char *url); // changes m_UID and m_quant
 	void CreateReportUrl(char *url);
     void CreateRawUrl(char *url, const char *cxr, const char *param);
