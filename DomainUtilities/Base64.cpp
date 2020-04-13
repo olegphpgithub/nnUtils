@@ -1,5 +1,6 @@
-#include "StdAfx.h"
 #include "Base64.h"
+
+#include <cctype>
 
 #define is_base64(c) (isalnum(c) || (c == '+') || (c == '/'))
 

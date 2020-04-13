@@ -17,7 +17,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     DomainUtilities/Base64.cpp \
-    DomainUtilities/InetClient.cpp \
     DomainUtilities/TinyAES.cpp \
     DomainUtilities/URLCipher.cpp \
     fileutility.cpp \
@@ -29,7 +28,6 @@ SOURCES += \
 
 HEADERS += \
     DomainUtilities/Base64.h \
-    DomainUtilities/InetClient.h \
     DomainUtilities/TinyAES.h \
     DomainUtilities/URLCipher.h \
     fileutility.h \

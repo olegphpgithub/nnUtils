@@ -1,9 +1,6 @@
-#ifndef _AES_H_
-#define _AES_H_
+#pragma once
 
-#if _MSC_VER < 1900
-	#include "stdint.h"
-#endif // _MSC_VER < 1900
+#include <stdint.h>
 
 // #define the macros below to 1/0 to enable/disable the mode of operation.
 //
@@ -113,5 +110,3 @@ private:
     void InvCipher(state_t* state, const uint8_t* RoundKey);
     void XorWithIv(uint8_t* buf, const uint8_t* Iv);
 };
-
-#endif //_AES_H_

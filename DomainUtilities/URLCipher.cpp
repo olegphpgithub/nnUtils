@@ -1,11 +1,14 @@
-#include "StdAfx.h"
 #include "URLCipher.h"
 #include "TinyAES.h"
 #include "Base64.h"
-#include "InetClient.h"
+
+#include <Windows.h>
+#include <WinInet.h>
 
 
-std::string URLCipher::WrapperEncrypt(const unsigned char *secure_data, const int secure_len, const char *secret_key)
+std::string URLCipher::WrapperEncrypt(const unsigned char *secure_data,
+                                      const uint32_t secure_len,
+                                      const char *secret_key)
 {
     TinyAES aes;
 
@@ -36,7 +39,7 @@ std::string URLCipher::WrapperEncrypt(const unsigned char *secure_data, const in
     SecureZeroMemory(ctx.Iv, sizeof(ctx.Iv));
     
     std::string edata = Base64::base64_encode(inbuff, size_aligned);
-    edata = InetClient::URLEncode(edata);
+    edata = URLEncode(edata);
 	delete [] inbuff;
     return edata;
 }
@@ -83,4 +86,38 @@ std::string URLCipher::DownloaderDecrypt(std::string edata, const char *secret_k
 
     raw.clear();
     return rdata;
+}
+
+
+std::string URLCipher::URLEncode(const std::string &value)
+{
+    const char DEC2HEX[16 + 1] = "0123456789ABCDEF";
+
+    std::string escaped = "";
+
+    for(unsigned int i = 0; i < value.length(); i++)
+    {
+        if( value[i] == '%' || value[i] == '$' || value[i] == '&' || value[i] == '+' || value[i] == ','  ||
+            value[i] == '/' || value[i] == ':' || value[i] == '[' || value[i] == ']' || value[i] == '\\' ||
+            value[i] == ';' || value[i] == '=' || value[i] == '?' || value[i] == '@' || value[i] == '#'  ||
+            value[i] < 0x20 || value[i] > 0x7E )
+        {
+            escaped += '%';
+            escaped += DEC2HEX[ (value[i] >> 4) & 0x0F];
+            escaped += DEC2HEX[ value[i] & 0x0F];
+        }
+        else
+        {
+            if(value[i] == ' ')
+            {
+                escaped += '+';
+            }
+            else
+            {
+                escaped += value[i];
+            }
+        }
+    }
+
+    return escaped;
 }
