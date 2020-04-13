@@ -571,7 +571,7 @@ void InetClient::gen_random(char *s, const int len)
 
 }
 
-void InetClient::ProcessURL(char* url)
+void InetClient::ProcessURL(char *url)
 {
 	std::string str = url;
 
@@ -775,44 +775,41 @@ void InetClient::CreateReportUrl(char *url)
     sprintf_s(url, 1024, "%s", strURI.c_str());
 }
 
-void InetClient::CreateRawUrl(char *url, const char *cxr, const char *param, bool withQuant)
+void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param, bool withQuant)
 {
-	DWORD SecureBuffer[IC_SEC_BUF_SIZE];
-	DWORD dwResultSize = 0;
+    char szPureURL[2048];
+    size_t cbPureURL = 0;
 
-    std::string cxrURL(cxr);
-	
-	// first 16 bytes
-	char rbuffer1[256] = {0};
-	InetClient::gen_random(rbuffer1, 16);
-	
-	// the rnd param
-	char rbuffer2[256] = {0};
-	
-    unsigned int size = QRandomGenerator::global()->generate();
-	
-	InetClient::gen_random(rbuffer2, 30 + size % 30);
-
-	std::string sparam = param;
-
-	// create the url :
-	if (withQuant)
-	{
-        SecureSprintf(SecureBuffer, &dwResultSize, cxrURL.c_str(), rbuffer1, sparam.c_str(), m_quant.c_str(), rbuffer2, NULL);
-	}
-	else
-	{
-        if ( sparam.length() > 0)
-        {
-            sparam.insert(0, "&");
-		}
-        SecureSprintf(SecureBuffer, &dwResultSize, cxrURL.c_str(), rbuffer1, sparam.c_str(), rbuffer2, nullptr, nullptr);
+    // create the url :
+    if (withQuant)
+    {
+        sprintf_s(szPureURL,
+                  2048,
+                  tpl,
+                  "random_string_16",
+                  param,
+                  m_quant.c_str(),
+                  "random_string_30______________");
+    }
+    else
+    {
+        sprintf_s(szPureURL,
+                  2048,
+                  tpl,
+                  "random_string_16",
+                  param,
+                  "random_string_30______________");
 	}
 
-    std::string strQueryEncrypted = URLCipher::WrapperEncrypt( (byte *) SecureBuffer, dwResultSize, "CA1F5D1C32B5B621EE824AE5328DA");
-    #ifndef _DEBUG
-	SecureZeroMemory((byte *) SecureBuffer, sizeof(SecureBuffer) );
-    #endif
+    cbPureURL = strlen(szPureURL);
+    for(unsigned int i = 0; i < cbPureURL; i++)
+    {
+        szPureURL[i] = szPureURL[i] ^ 0xAA;
+    }
+
+    std::string strQueryEncrypted = URLCipher::WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
+                                                              cbPureURL,
+                                                              "CA1F5D1C32B5B621EE824AE5328DA");
 
     std::string strURI = "https://";
     strURI += cxrMainDomain;
@@ -820,17 +817,6 @@ void InetClient::CreateRawUrl(char *url, const char *cxr, const char *param, boo
     strURI += "/?";
 	strURI += strQueryEncrypted;
 
-	#if defined(_DEBUG) && defined(IC_DBG_PRINT)
-	byte *ptr = (byte *) SecureBuffer;
-	for(unsigned int i = 0; i < dwResultSize; i++)
-		*(ptr++) ^= 0xAA; 
-	PRINT_LOG("\r\n------\r\nWith quant[ %u ] len = %u (max_1024); url = %s\r\nSecBuf ^ AA -> %s\r\nResultingUrl-> %s\r\n------", withQuant, strURI.length(), url, SecureBuffer, strURI.c_str());
-
-	SecureZeroMemory((byte *) SecureBuffer, sizeof(SecureBuffer) );
-	#endif
-
-	// ! Assumes that the size of url buffer is equal to 1024 or larger:
-	// @ 
     sprintf_s(url, 1024, "%s", strURI.c_str());
 	
 }
