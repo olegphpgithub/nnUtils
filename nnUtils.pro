@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     DomainUtilities/Base64.cpp \
+    DomainUtilities/InetClient.cpp \
     DomainUtilities/TinyAES.cpp \
     DomainUtilities/URLCipher.cpp \
     fileutility.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
 
 HEADERS += \
     DomainUtilities/Base64.h \
+    DomainUtilities/InetClient.h \
     DomainUtilities/TinyAES.h \
     DomainUtilities/URLCipher.h \
     fileutility.h \
