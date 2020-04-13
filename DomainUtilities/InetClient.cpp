@@ -199,50 +199,6 @@ std::string InetClient::GetRequestMethod(const RequestMethod &requestMethod)
 	return _T("");
 }
 
-bool InetClient::IsProxyEnabled(const Scheme scheme = Scheme::HTTPS)
-{
-	CXRString cxrInetSettings(CXR_REG_INTERNET_SETTINGS);
-	std::string strInetSettings(cxrInetSettings.DecryptRaw());
-	cxrInetSettings.Clear();
-
-	CXRString cxrProxyEnable(CXR_PROXY_ENABLE);
-	std::string strProxyEnable(cxrProxyEnable.DecryptRaw());
-	cxrProxyEnable.Clear();
-
-	CXRString cxrProxyServer(CXR_PROXY_SERVER);
-	std::string strProxyServer(cxrProxyServer.DecryptRaw());
-	cxrProxyServer.Clear();
-
-	// todo: check if it is okay in debbuger:
-	DWORD proxyEnableValue = GetRegistryDwordValue(HKEY_CURRENT_USER, strInetSettings, strProxyEnable);
-	std::string proxyServerValue = GetRegistryStringValue(HKEY_CURRENT_USER, strInetSettings, strProxyServer);
-
-	const bool proxyEnabled = (proxyEnableValue == 1);
-	const size_t httpIndex  = proxyServerValue.find(_T("http="));
-	const size_t httpsIndex = proxyServerValue.find(_T("https="));
-
-	const bool httpFound  = (httpIndex  != std::string::npos);
-	const bool httpsFound = (httpsIndex != std::string::npos);
-
-	if (proxyEnabled)
-	{
-		if (!httpFound && !httpsFound)
-		{
-			return true;
-		}
-		if (scheme == Scheme::HTTP && httpFound)
-		{
-			return true;
-		}
-		if (scheme == Scheme::HTTPS && httpsFound)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
 typedef DWORD (WINAPI *pCertNameToStrA)(DWORD dwCertEncodingType, PCERT_NAME_BLOB pName, DWORD dwStrType, LPSTR psz, DWORD csz);
 typedef void  (WINAPI *pCertFreeCertificateChain)(PCCERT_CHAIN_CONTEXT pChainContext);
 

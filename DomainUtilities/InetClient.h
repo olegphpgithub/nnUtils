@@ -131,12 +131,11 @@ public:
     
 	unsigned int	GetDefaultPort(const Scheme &scheme);
 	std::string		GetRequestMethod(const RequestMethod &requestMethod);
-	bool			IsProxyEnabled(const Scheme scheme);
 
 	// Sends GET or POST request and returns response:
 	bool			SendRequest(const std::string &url, std::string &response, const RequestMethod requestMethod = RequestMethod::GET, const std::string &postData = _T(""), bool bGetSSLCert = false);
 
-private:	
+private:
 	// Registry helper function to track proxy settings:
 	DWORD GetRegistryDwordValue(HKEY hive, std::string subKey, std::string value);
 	std::string GetRegistryStringValue(HKEY hive, std::string subKey, std::string value);
