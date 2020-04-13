@@ -26,39 +26,6 @@ InetClient::~InetClient(void)
 	this -> Disconnect();
 }
 
-std::string InetClient::URLEncode(const std::string &value)
-{
-	const TCHAR DEC2HEX[16 + 1] = _T("0123456789ABCDEF");
-	
-	std::string escaped = _T("");
-	
-	for(unsigned int i = 0; i < value.length(); i++)
-	{
-		if( value[i] == _T('%') || value[i] == _T('$') || value[i] == _T('&') || value[i] == _T('+') || value[i] == _T(',')  ||
-		    value[i] == _T('/') || value[i] == _T(':') || value[i] == _T('[') || value[i] == _T(']') || value[i] == _T('\\') ||
-		    value[i] == _T(';') || value[i] == _T('=') || value[i] == _T('?') || value[i] == _T('@') || value[i] == _T('#')  || 
-		    value[i] < 0x20 || value[i] > 0x7E )
-		{
-			escaped += _T('%');
-			escaped += DEC2HEX[ (value[i] >> 4) & 0x0F];
-			escaped += DEC2HEX[ value[i] & 0x0F];
-		}
-		else
-		{
-			if( value[i] == _T(' '))
-			{
-				escaped += _T('+');
-			}
-			else
-			{
-				escaped += value[i];
-			}
-		}
-	}
-
-	return escaped;
-}
-
 bool InetClient::Connect(const std::string &host, int port = INTERNET_DEFAULT_HTTP_PORT, DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG)
 {
 	m_bConnected = true;
@@ -274,58 +241,6 @@ bool InetClient::IsProxyEnabled(const Scheme scheme = Scheme::HTTPS)
 	}
 
 	return false;
-}
-
-bool InetClient::IsAvailableDirectConnection()
-{
-#ifdef USE_FIDDLER
-	return false;
-#endif // USE_FIDDLER
-
-	bool directConnection = false;
-	
-	TCHAR url[11]; // google.com
-	url[4] = _T('l'); url[5] = _T('e'); url[9] = _T('m'); url[8] = _T('o'); url[3] = _T('g'); url[6] = _T('.'); url[10] = _T('\0');
-	url[7] = _T('c'); url[2] = _T('o'); url[0] = _T('g'); url[1] = _T('o');
-	
-	if( ! Connect(url, GetDefaultPort(Scheme::HTTP), INTERNET_OPEN_TYPE_DIRECT) )
-	{
-		return false;
-	}
-	
-	DWORD dwRequestFlags = 0;
-	// On Windows 7, Windows Server 2008 R2, and later, the lpszVersion parameter is overridden by Internet Explorer settings.
-	HINTERNET hRequest = HttpOpenRequest(m_hSession, NULL, _T("/"), NULL, NULL, NULL, dwRequestFlags, 0);
-	
-	if (hRequest == NULL)
-	{
-		m_dwErr = GetLastError();
-		return false;
-	}
-	
-	// An application can use the same HTTP request handle in multiple calls to HttpSendRequest,
-	// but the application must read all data returned from the previous call before calling the function again.
-	// In offline mode, HttpSendRequest returns ERROR_FILE_NOT_FOUND if the resource is not found in the Internet cache.
-	BOOL retSend = HttpSendRequest(hRequest, NULL, 0, NULL, 0);
-	
-	if (retSend == TRUE)
-	{
-		DWORD statusCode = 0;
-		DWORD dwSize = sizeof(DWORD);
-		
-		BOOL ret = HttpQueryInfo(hRequest, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &statusCode, &dwSize, NULL);
-
-		if (ret == TRUE && statusCode == 200)
-		{
-			directConnection = true;
-		}
-	}
-	
-	InternetCloseHandle(hRequest);
-	
-	Disconnect();
-
-	return directConnection;
 }
 
 typedef DWORD (WINAPI *pCertNameToStrA)(DWORD dwCertEncodingType, PCERT_NAME_BLOB pName, DWORD dwStrType, LPSTR psz, DWORD csz);

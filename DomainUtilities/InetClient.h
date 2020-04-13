@@ -63,10 +63,6 @@ public:
     GET = 0,
     POST
 	};
-    
-	// Inet related functions from URLManager (ex Onion):
-	// --------------------------------------------------
-	static std::string URLEncode(const std::string &value);
 	
 	std::string  GenerateGuid();
 	const char  *getDomain();
@@ -136,10 +132,7 @@ public:
 	unsigned int	GetDefaultPort(const Scheme &scheme);
 	std::string		GetRequestMethod(const RequestMethod &requestMethod);
 	bool			IsProxyEnabled(const Scheme scheme);
-	
-	// Checks direct connection to google.com without using proxy configuration (INTERNET_OPEN_TYPE_DIRECT):
-    bool			IsAvailableDirectConnection();
-    
+
 	// Sends GET or POST request and returns response:
 	bool			SendRequest(const std::string &url, std::string &response, const RequestMethod requestMethod = RequestMethod::GET, const std::string &postData = _T(""), bool bGetSSLCert = false);
 
