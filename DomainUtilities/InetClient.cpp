@@ -1,24 +1,33 @@
-#include "StdAfx.h"
+#include <Windows.h>
+
 #include "InetClient.h"
+
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+
+
+#include <WinInet.h>
+#include <Winineti.h>
+
+#pragma comment(lib, "User32.lib")
+#pragma comment(lib, "Ole32.lib")
+
+#include <QRandomGenerator>
 
 InetClient::InetClient(void)
 {
 	m_bUsePrevRND = false;
 	m_bConnected  = false;
-	m_hInternet   = m_hSession = NULL;
+    m_hInternet   = m_hSession = nullptr;
 	
-	m_szSSLCert[IC_SSL_CERT_BUF_SIZE - 1] = _T('\0');
+    m_szSSLCert[IC_SSL_CERT_BUF_SIZE - 1] = '\0';
+    m_sUserAgent.assign("NSIS_Inetc (Mozilla)");
 	
-	CXRString cxrUserAgent(CXR_NSIS_INETC_MOZILLA);
-	m_sUserAgent.assign(cxrUserAgent.DecryptRaw());
-	cxrUserAgent.Clear();
-	
-	#if defined(_DEBUG) && defined(IC_DBG_PRINT)
-	PRINT_LOG("InetClient(); ctor.");
-	#endif
-	cxrMainDomain.SetValue(CXR_MAINDomain);
-	cxrReportUrlA.SetValue(CXR_ReportUrlA);
-	cxrReportUrlB.SetValue(CXR_ReportUrlB);
+    cxrMainDomain.assign("downloadsoftcenter.com");
 }
 
 InetClient::~InetClient(void)
@@ -26,7 +35,9 @@ InetClient::~InetClient(void)
 	this -> Disconnect();
 }
 
-bool InetClient::Connect(const std::string &host, int port = INTERNET_DEFAULT_HTTP_PORT, DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG)
+bool InetClient::Connect(const std::string &host,
+                         int port = INTERNET_DEFAULT_HTTP_PORT,
+                         DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG)
 {
 	m_bConnected = true;
 	
@@ -38,17 +49,17 @@ bool InetClient::Connect(const std::string &host, int port = INTERNET_DEFAULT_HT
 	// INTERNET_OPEN_TYPE_PRECONFIG - retrieves the proxy or direct configuration from the registry.
 	// After the calling application has finished using the HINTERNET handle returned by InternetOpen, it must be closed using the InternetCloseHandle function.
     // Like all other aspects of the WinINet API, this function cannot be safely called from within DllMain or the constructors and destructors of global objects.
-	if( (m_hInternet = InternetOpen(m_sUserAgent.c_str(), dwAccessType, NULL, NULL, 0)) == NULL )
-	{
-		m_dwErr = GetLastError();
-		m_bConnected = false;
-	}
-    
-	// Like all other aspects of the WinINet API, this function cannot be safely called from within DllMain or the constructors and destructors of global objects.
-	if( (m_hSession = InternetConnect(m_hInternet, host.c_str(), port, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0)) == NULL )
+    if((m_hInternet = InternetOpenA(m_sUserAgent.c_str(), dwAccessType, nullptr, nullptr, 0)) == nullptr)
     {
         m_dwErr = GetLastError();
-		m_bConnected = false;
+        m_bConnected = false;
+    }
+    
+	// Like all other aspects of the WinINet API, this function cannot be safely called from within DllMain or the constructors and destructors of global objects.
+    if( (m_hSession = InternetConnectA(m_hInternet, host.c_str(), port, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0)) == nullptr )
+    {
+        m_dwErr = GetLastError();
+        m_bConnected = false;
     }
 
     return m_bConnected;
@@ -59,21 +70,21 @@ bool InetClient::Disconnect()
     if (m_bConnected)
     {
         // The function terminates any pending operations on the handle and discards any outstanding data.
-		if( m_hSession != NULL )
+        if(m_hSession != nullptr)
 		{
 			if( InternetCloseHandle(m_hSession) != NULL )
 			{
-				m_hSession   = NULL;
+                m_hSession   = nullptr;
 				m_bConnected = false;
 			}
 			else
 				m_dwErr = GetLastError();
 		}
-		if( m_hInternet != NULL )
+        if(m_hInternet != nullptr)
 		{
 			if( InternetCloseHandle(m_hInternet) != NULL )
 			{
-				m_hInternet  = NULL;
+                m_hInternet  = nullptr;
 				m_bConnected = false;
 			}
 			else
@@ -91,13 +102,13 @@ bool InetClient::Disconnect()
 	}
 }
 
-bool InetClient::ParseURL(const std::string &url, InetClient::Scheme &scheme, std::string &host, int &port, std::string &query)
+bool InetClient::ParseURL(const std::string &url, InetClient::Scheme &scheme, std::string &host, unsigned int &port, std::string &query)
 {
 	std::string remains;
 	
 	// SplitURLScheme:
 	{
-	std::string delimiter(_T("://"));
+    std::string delimiter("://");
     size_t delimiterIndex = url.find(delimiter);
 
 	const bool noDelimiterFound		 = ( delimiterIndex == std::string::npos );
@@ -110,12 +121,12 @@ bool InetClient::ParseURL(const std::string &url, InetClient::Scheme &scheme, st
 	std::string schemeStr = url.substr(0, delimiterIndex);
 	std::transform(schemeStr.begin(), schemeStr.end(), schemeStr.begin(), ::tolower);
 
-    if (schemeStr == _T("http"))
+    if (schemeStr == "http")
 	{
         scheme = Scheme::HTTP;
 	}
 	else
-    if (schemeStr == _T("https"))
+    if (schemeStr == "https")
     {
         scheme = Scheme::HTTPS;
     }
@@ -129,8 +140,8 @@ bool InetClient::ParseURL(const std::string &url, InetClient::Scheme &scheme, st
 
 	// ParseURLRemains:
 	{
-	const size_t colonIndex = remains.find(_T(':'));
-    const size_t slashIndex = remains.find(_T('/'));
+    const size_t colonIndex = remains.find(':');
+    const size_t slashIndex = remains.find('/');
 
 	const bool colonFound = (colonIndex != std::string::npos);
 	const bool slashFound = (slashIndex != std::string::npos);
@@ -166,7 +177,7 @@ bool InetClient::ParseURL(const std::string &url, InetClient::Scheme &scheme, st
     }
     else
     {
-        query = _T("/");
+        query = "/";
     }
 	}
 
@@ -191,12 +202,12 @@ std::string InetClient::GetRequestMethod(const RequestMethod &requestMethod)
     switch (requestMethod)
     {
     case RequestMethod::GET:
-        return _T("GET");
+        return "GET";
     case RequestMethod::POST:
-        return _T("POST");
+        return "POST";
     }
 	
-	return _T("");
+    return "";
 }
 
 typedef DWORD (WINAPI *pCertNameToStrA)(DWORD dwCertEncodingType, PCERT_NAME_BLOB pName, DWORD dwStrType, LPSTR psz, DWORD csz);
@@ -206,7 +217,7 @@ bool InetClient::SendRequest(const std::string &url, std::string &response, cons
 {
     Scheme			scheme;
 	std::string		host;
-	int				port;
+    unsigned int	port;
 	std::string		query;
     
 	if( ! ParseURL(url, scheme, host, port, query) )
@@ -214,15 +225,7 @@ bool InetClient::SendRequest(const std::string &url, std::string &response, cons
 		return false;
 	}
     
-	DWORD dwAccessType = INTERNET_OPEN_TYPE_DIRECT;
-    
-	if (IsProxyEnabled(scheme))
-    {
-        if ( ! IsAvailableDirectConnection() )
-        {
-            dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG;
-        }
-    }
+    DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG;
     
 	if( ! Connect(host, port, dwAccessType) )
 	{
@@ -242,8 +245,15 @@ bool InetClient::SendRequest(const std::string &url, std::string &response, cons
 	dwRequestFlags |= INTERNET_FLAG_NO_COOKIES;
 	dwRequestFlags |= INTERNET_FLAG_KEEP_CONNECTION;
 
-    HINTERNET hRequest = HttpOpenRequest(m_hSession, GetRequestMethod(requestMethod).c_str(), query.c_str(), HTTP_VERSION, NULL, NULL, dwRequestFlags, 0);
-    if (hRequest == NULL)
+    HINTERNET hRequest = HttpOpenRequestA(m_hSession,
+                                          GetRequestMethod(requestMethod).c_str(),
+                                          query.c_str(),
+                                          HTTP_VERSIONA,
+                                          nullptr,
+                                          nullptr,
+                                          dwRequestFlags,
+                                          0);
+    if (hRequest == nullptr)
 	{
 		m_dwErr = GetLastError();
 		Disconnect();
@@ -254,21 +264,15 @@ bool InetClient::SendRequest(const std::string &url, std::string &response, cons
 	BOOL retSend = FALSE;
     if (requestMethod == RequestMethod::POST)
     {
-        TCHAR head[48]; // Content-Type: application/x-www-form-urlencoded
-        head[23] = _T('o'); head[26] = _T('x'); head[14] = _T('a'); head[4]  = _T('e'); head[8]  = _T('T'); head[1]  = _T('o'); head[35] = _T('m'); head[40] = _T('e'); head[42] = _T('c'); 
-        head[9]  = _T('y'); head[24] = _T('n'); head[32] = _T('f'); head[29] = _T('w'); head[31] = _T('-'); head[41] = _T('n'); head[45] = _T('e'); head[11] = _T('e'); head[17] = _T('l'); 
-        head[3]  = _T('t'); head[43] = _T('o'); head[36] = _T('-'); head[13] = _T(' '); head[44] = _T('d'); head[6]  = _T('t'); head[5]  = _T('n'); head[20] = _T('a'); head[30] = _T('w'); 
-        head[33] = _T('o'); head[28] = _T('w'); head[2]  = _T('n'); head[21] = _T('t'); head[19] = _T('c'); head[18] = _T('i'); head[39] = _T('l'); head[27] = _T('-'); head[47] = _T('\0'); 
-        head[38] = _T('r'); head[7]  = _T('-'); head[46] = _T('d'); head[0]  = _T('C'); head[16] = _T('p'); head[34] = _T('r'); head[12] = _T(':'); head[25] = _T('/'); head[10] = _T('p'); 
-        head[15] = _T('p'); head[22] = _T('i'); head[37] = _T('u'); 
+        char head[48] = "Content-Type: application/x-www-form-urlencoded";
 		std::string headers = head;
         
-		retSend = HttpSendRequest(hRequest, headers.c_str(), static_cast<DWORD>(headers.length()), LPVOID(postData.c_str()), static_cast<DWORD>(postData.length()));
+        retSend = HttpSendRequestA(hRequest, headers.c_str(), static_cast<DWORD>(headers.length()), LPVOID(postData.c_str()), static_cast<DWORD>(postData.length()));
     }
     else
 	if (requestMethod == RequestMethod::GET)
 	{
-        retSend = HttpSendRequest(hRequest, NULL, 0, NULL, 0);
+        retSend = HttpSendRequestA(hRequest, NULL, 0, NULL, 0);
 	}
 
 	if (retSend == NULL)
@@ -282,57 +286,56 @@ bool InetClient::SendRequest(const std::string &url, std::string &response, cons
 			
 	if (bGetSSLCert)
 	{
-		PCCERT_CHAIN_CONTEXT CertCtxPtr = NULL;
+        PCCERT_CHAIN_CONTEXT CertCtxPtr = nullptr;
 		
 		// V568 It's odd that 'sizeof()' operator evaluates the size of a pointer to a class, but not the size of the 'CertCtx' class object.
 		// Checked in debugger that InternetQueryOptions sets pointer to an address of some allocated struct:
 		DWORD cbCertSizePtr = sizeof(CertCtxPtr);
-		int impleCertChainIndex = 0;
 		
 		// Retrieves the server’s certificate-chain context as a duplicated PCCERT_CHAIN_CONTEXT.
 		// You may pass this duplicated context to any Crypto API function which takes a PCCERT_CHAIN_CONTEXT.
 		// You must call CertFreeCertificateChain on the returned PCCERT_CHAIN_CONTEXT when you are done with the certificate-chain context.
 		// Version: Requires Internet Explorer 8.0.
-		if ( InternetQueryOption(hRequest, INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT, (LPVOID)&CertCtxPtr, &cbCertSizePtr) )
+        if ( InternetQueryOption(hRequest,
+                                 INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT,
+                                 reinterpret_cast<LPVOID>(&CertCtxPtr),
+                                 &cbCertSizePtr))
 		{
 			PCCERT_CHAIN_CONTEXT pChainContext = CertCtxPtr;
-			CERT_SIMPLE_CHAIN *simpleCertificateChainWithinContext = NULL;
+            CERT_SIMPLE_CHAIN *simpleCertificateChainWithinContext = nullptr;
 			
-			pCertFreeCertificateChain fCertFreeCertificateChain = NULL;
+            pCertFreeCertificateChain fCertFreeCertificateChain = nullptr;
 
-			if (pChainContext->rgpChain != NULL)
+            if (pChainContext->rgpChain != nullptr)
 			{
 				simpleCertificateChainWithinContext=pChainContext->rgpChain[0];
 				if  (simpleCertificateChainWithinContext->cElement > 0)
 				{
 					PCCERT_CONTEXT pCertContext = simpleCertificateChainWithinContext->rgpElement[0]->pCertContext;
 
-					pCertNameToStrA fCertNameToStrA = NULL;
-					CXRString str(CXR_Crypt32dll);
+                    pCertNameToStrA fCertNameToStrA = nullptr;
 
-					HMODULE hDll = LoadLibrary(str.DecryptRaw());
-					if (hDll != NULL)
+                    HMODULE hDll = LoadLibraryA("crypt32.dll");
+                    if (hDll != nullptr)
 					{
-						str.SetValue(CXR_CertNameToStrA);
-						fCertNameToStrA = (pCertNameToStrA)GetProcAddress(hDll, str.DecryptRaw());
-
-						str.SetValue(CXR_CertFreeCertificateChain);
-						fCertFreeCertificateChain = (pCertFreeCertificateChain) GetProcAddress(hDll, str.DecryptRaw());
+                        fCertNameToStrA = (pCertNameToStrA)GetProcAddress(hDll, "CertNameToStrA");
+                        fCertFreeCertificateChain = (pCertFreeCertificateChain)GetProcAddress(hDll, "CertFreeCertificateChain");
 					}
 
 					// Retrieve certificate issuer and save it into m_szSSLCert for future comparison:
-					if (fCertNameToStrA != NULL)
-						fCertNameToStrA(X509_ASN_ENCODING, &pCertContext->pCertInfo->Issuer, CERT_X500_NAME_STR, m_szSSLCert, IC_SSL_CERT_BUF_SIZE);
-
-					// CERT_HASH_PROP_ID - is a thumbprint
-					//CertNameToStrA(X509_ASN_ENCODING, &pCertContext->pCertInfo->Issuer, CERT_X500_NAME_STR, m_szSSLCert, IC_SSL_CERT_BUF_SIZE);
+                    if (fCertNameToStrA != nullptr)
+                        fCertNameToStrA(X509_ASN_ENCODING,
+                                        &pCertContext->pCertInfo->Issuer,
+                                        CERT_X500_NAME_STR,
+                                        m_szSSLCert,
+                                        IC_SSL_CERT_BUF_SIZE);
 				}
 			}
 		
-		if( fCertFreeCertificateChain != NULL )
+        if( fCertFreeCertificateChain != nullptr )
 			fCertFreeCertificateChain(CertCtxPtr);
 
-		CertCtxPtr = NULL;
+        CertCtxPtr = nullptr;
 		}
 	}
 	
@@ -380,11 +383,11 @@ bool InetClient::SendGetRequest(const std::string &url, std::string &response)
 	
 	for (int i = 0; i < IC_MAX_TRIES; i++)
 	{
-		if ( ret = SendRequest(url, response, RequestMethod::GET, _T(""), false) )
+        if ( ret = SendRequest(url, response, RequestMethod::GET, "", false) )
 			break;
 
 		if (i < IC_MAX_TRIES - 1)
-			SLEEP(IC_TRIES_DELAY);
+            Sleep(IC_TRIES_DELAY);
 	}
 	
 	return ret;
@@ -397,14 +400,14 @@ bool InetClient::SendGetRequestWithSSLCert(const std::string &url, std::string &
 	for (int i = 0; i < IC_MAX_TRIES; i++)
 	{
 		// SendRequest get SSL cert and saves it in m_szSSLCert:
-		if ( ret = SendRequest(url, response, RequestMethod::GET, _T(""), true) ) 
+        if ( ret = SendRequest(url, response, RequestMethod::GET, "", true) )
 		{
 			strCertificate = m_szSSLCert;
 			break;
 		}
 		
 		if (i < IC_MAX_TRIES - 1)
-			SLEEP(IC_TRIES_DELAY);
+            Sleep(IC_TRIES_DELAY);
 	}
 	
 	return ret;
@@ -421,7 +424,7 @@ bool InetClient::SendPostRequest(const std::string &url, const std::string &post
 			break;
 
 		if (i < IC_MAX_TRIES - 1)
-			SLEEP(IC_TRIES_DELAY);
+            Sleep(IC_TRIES_DELAY);
 	}
 	
 	return ret;
@@ -438,7 +441,7 @@ bool InetClient::DownloadFile(const std::string &url)
 {
 	Scheme			scheme;
 	std::string		host;
-	int				port;
+    unsigned int	port;
 	std::string		query;
 
 	if( ! ParseURL(url, scheme, host, port, query) )
@@ -446,18 +449,10 @@ bool InetClient::DownloadFile(const std::string &url)
 		return false;
 	}
 
-	DWORD dwAccessType = INTERNET_OPEN_TYPE_DIRECT;
-	
-	if (IsProxyEnabled(scheme))
-    {
-        if ( ! IsAvailableDirectConnection() )
-        {
-            dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG;
-        }
-    }
+    DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG;
 
-	HINTERNET hInternet = InternetOpen(m_sUserAgent.c_str(), dwAccessType, NULL, NULL, 0);
-	if (hInternet == NULL)
+    HINTERNET hInternet = InternetOpenA(m_sUserAgent.c_str(), dwAccessType, nullptr, nullptr, 0);
+    if (hInternet == nullptr)
 	{
 		m_dwErr = GetLastError();
 		return false;
@@ -476,14 +471,10 @@ bool InetClient::DownloadFile(const std::string &url)
 	dwRequestFlags |= INTERNET_FLAG_NO_CACHE_WRITE;
 	dwRequestFlags |= INTERNET_FLAG_NO_COOKIES;
 
-	TCHAR szHeader[20]; // Accept: */*\r\n\r\n
-	szHeader[0] = _T('A'); szHeader[9]  = _T('/'); szHeader[8]  = _T('*'); szHeader[10] = _T('*');  szHeader[19] = _T('\0'); szHeader[16] = _T('r');
-	szHeader[2] = _T('c'); szHeader[12] = _T('r'); szHeader[4] = _T('p'); szHeader[5]  = _T('t'); szHeader[14] = _T('n'); szHeader[17] = _T('\\');
-	szHeader[3]  = _T('e');  szHeader[11] = _T('\\'); szHeader[6] = _T(':'); szHeader[15] = _T('\\');
-	szHeader[7] = _T(' '); szHeader[18] = _T('n'); szHeader[1]  = _T('c'); szHeader[13] = _T('\\');
+    char szHeader[20] = "Accept: */*\r\n\r\n";
 
-	HINTERNET hConnect = InternetOpenUrl(hInternet, url.c_str(), szHeader, sizeof(szHeader) / sizeof(TCHAR) - 1, dwRequestFlags, 0);
-	if (hConnect == NULL)
+    HINTERNET hConnect = InternetOpenUrlA(hInternet, url.c_str(), szHeader, sizeof(szHeader) / sizeof(TCHAR) - 1, dwRequestFlags, 0);
+    if (hConnect == nullptr)
 	{
 		m_dwErr = GetLastError();
 		InternetCloseHandle(hInternet);
@@ -559,81 +550,25 @@ byte *InetClient::GetDownloadedFileBuffer()
 	if( m_DownloadedFileSize > 0 )
 		return &m_DownloadedFile[0];
 	else
-		return NULL;
+        return nullptr;
 }
 
-// todo: verify that it works properly
-DWORD InetClient::GetRegistryDwordValue(HKEY hive, std::string subKey, std::string value)
-{
-    HKEY key;
-    DWORD result = 0;
-    
-	if (RegOpenKeyEx(hive, subKey.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
-    {
-        DWORD bufferSize = sizeof(DWORD);
-        RegQueryValueEx(key, value.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&result), &bufferSize);
-    }
-    RegCloseKey(key);
-    
-	return result;
-}
-
-std::string InetClient::GetRegistryStringValue(HKEY hive, std::string subKey, std::string value)
-{
-    HKEY key;
-	std::string result;
-    
-	if (RegOpenKeyEx(hive, subKey.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
-    {
-		std::vector<char> buffer;
-        DWORD bufferSize = static_cast<DWORD>(buffer.size());
-        
-		LSTATUS success = RegQueryValueEx(key, value.c_str(), NULL, NULL, NULL, &bufferSize);
-        if (success == ERROR_SUCCESS)
-        {
-            buffer.resize(bufferSize / sizeof(char));
-            
-			success = RegQueryValueEx(key, value.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&buffer[0]), &bufferSize);
-            
-			if (success == ERROR_SUCCESS)
-            {
-				int buflen = buffer.size();
-				if (buflen > 0)
-				{
-					result = std::string(buffer.begin(), buffer.end() - 1);
-				}
-            }
-        }
-    }
-    
-	RegCloseKey(key);
-    
-	return result;
-}
 // ------------------------------------
 // Inet related functions from URLManager (ex Onion)
-void InetClient::gen_random(char *s, const int len) 
+void InetClient::gen_random(char *s, const int len)
 {
-	
 	const char alphanum[] =
 		"0123456789"
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz";
-	
-	//CXRString str(CXR_alphanum);
-	//std::string alphanum = str.DecryptRawString();
-
-	srand( (unsigned int) time(NULL));
-	unsigned int size;
 
 	for (int i = 0; i < len; ++i) {
-		rand_s(&size);
+        quint32 size = QRandomGenerator::global()->generate();
 		s[i] = alphanum[size % (sizeof(alphanum) - 1)];
-		//s[i] = alphanum[size % (alphanum.length() - 1)];
 	}
     
-	// Should be [len - 1], but the whole download process gets broken: 
 	s[len] = 0;
+
 }
 
 void InetClient::ProcessURL(char* url)
@@ -682,7 +617,7 @@ void InetClient::ProcessURL(char* url)
 				if (str.find("b:") == 0)
 				{
 					str.erase(0, 2);
-					CreateRawUrl(url, CXR_IPB, str.c_str(), false);
+                    CreateRawUrl(url, "%sscript=ipb.php&%s&rnd=%s", str.c_str(), false);
 				}
 			} break;
 		case 'p':
@@ -690,39 +625,39 @@ void InetClient::ProcessURL(char* url)
 				if (str.find("p3:") == 0)
 				{
 					str.erase(0,3);
-					CreateRawUrl(url, CXR_POSTDATA3, str.c_str(), false);
+                    CreateRawUrl(url, "%sscript=postdata3.php%s&rnd=%s", str.c_str(), false);
 				}
 				else
 				{
 					if (str.find("p4:") == 0)
 					{
 						str.erase(0, 3);
-						CreateRawUrl(url, CXR_POSTDATA4, str.c_str(), false);
+                        CreateRawUrl(url, "%sscript=postdata4.php%s&rnd=%s", str.c_str(), false);
 					}
 					else
 					{
 						if (str.find("px:") == 0)
 						{
 							str.erase(0, 3);
-							CreateRawUrl(url, CXR_Pixel, str.c_str(), false);
+                            CreateRawUrl(url, "%sscript=pixel.php%s&rnd=%s", str.c_str(), false);
 						}
 						else
 						{
 							if (str.find("pf:") == 0)
 							{
-								CreateRawUrl(url, CXR_FUSE, "", false);
+                                CreateRawUrl(url, "%sscript=fuse.php%s&rnd=%s", "", false);
 							}
 							else
 							{
 								if (str.find("pt:") == 0)
 								{
-									CreateRawUrl(url, CXR_POSTTEST, "", false);
+                                    CreateRawUrl(url, "%sscript=posttest.php%s&rnd=%s", "", false);
 								}
 								else
 								{
 									if (str.find("pa:") == 0)
 									{
-										CreateRawUrl(url, CXR_ADR, "", false);
+                                        CreateRawUrl(url, "%sscript=addr.php%s&rnd=%s", "", false);
 									}
 								}
 							}
@@ -735,7 +670,7 @@ void InetClient::ProcessURL(char* url)
 				if (str.find("f:") == 0)
 				{
 					str.erase(0, 2);
-					CreateRawUrl(url, CXR_DL_URL, str.c_str(), true);
+                    CreateRawUrl(url, "%sscript=optin.php&f=%s&quant=%s&rnd=%s", str.c_str(), true);
 				}
 
 			} break;
@@ -744,7 +679,7 @@ void InetClient::ProcessURL(char* url)
 				if (str.find("m:") == 0)
 				{
 					str.erase(0, 2);
-					CreateRawUrl(url, CXR_MD5Url, str.c_str(), true);
+                    CreateRawUrl(url, "%sscript=info.php&%s&quant=%s&rnd=%s", str.c_str(), true);
 				}
 				
 			} break;
@@ -752,7 +687,7 @@ void InetClient::ProcessURL(char* url)
 			{
 				if ( str.find("c3:") == 0)
 				{
-					CreateRawUrl(url, CXR_CF3, "", false);
+                    CreateRawUrl(url, "%sscript=cf3.php%s&rnd=%s", "", false);
 				}
 			} break;
 		case 'r':
@@ -760,7 +695,7 @@ void InetClient::ProcessURL(char* url)
 				
 				if ( str.find("rk1:") == 0)
 				{
-					CreateRawUrl(url, CXR_RKURL, "", true);
+                    CreateRawUrl(url, "%sscript=relevant.exe%s&quant=%s&rnd=%s", "", true);
 				}
 			} break;
 		case 't':
@@ -780,7 +715,7 @@ void InetClient::ProcessURL(char* url)
 							m_UID = str;
 							m_UID.erase(0, pos + 3);
 						}
-						CreateRawUrl(url, CXR_TIME2, "", true);
+                        CreateRawUrl(url, "%sscript=time2.php%s&rnd=%s", "", true);
 					}
 					
 				}
@@ -796,72 +731,48 @@ void InetClient::ProcessURL(char* url)
 
 void InetClient::CreateReportUrl(char *url)
 {
-	DWORD SecureBuffer[IC_SEC_BUF_SIZE];
-	DWORD dwResultSize = 0;
-	
-	// first 16 bytes
- 	char rbuffer1[256] = {0};
- 		
-	InetClient::gen_random(rbuffer1, 16);
- 	
-	// the rnd param
-	char rbuffer2[256] = {0};
-	
-	unsigned int size;
-	// If the function fails for any other reason, *randomValue is set to 0.
- 	rand_s(&size);
- 	
-	InetClient::gen_random(rbuffer2, 30 + size % 30);
- 	
-	// decide if to use RND value from previous request.
-	// do not overwrite stored RND value if the flag is turned on:
-    if( this->m_bUsePrevRND == false ) 
- 		this->m_RND = rbuffer2;
-    
-	// use stored value instead of generated one:
-	if ( this->m_bUsePrevRND && this->m_RND.length() != 0 ) 
-	{
-		sprintf_s(rbuffer2, "%s", m_RND.c_str()); 
-	}
+    char szPureURL[2048];
+    size_t cbPureURL = 0;
 
-	if ( m_quant.empty() )
-	{
-		// create report url - no quant:
-		SecureSprintf(SecureBuffer, &dwResultSize, cxrReportUrlA.DecryptXOR(), rbuffer1, m_UID.c_str(), m_action.c_str(), rbuffer2, NULL);
-		cxrReportUrlA.Clear();
+    if (m_quant.empty())
+    {
+        sprintf_s(szPureURL,
+                  2048,
+                  "%sscript=installer.php&CODE=PUTGQ&UID=%s&action=%s&rnd=%s",
+                  "random_string_16",
+                  m_UID.c_str(),
+                  m_action.c_str(),
+                  "random_string_30______________");
 	}
 	else
 	{
-		// create full report url:
-		SecureSprintf(SecureBuffer, &dwResultSize, cxrReportUrlB.DecryptXOR(), rbuffer1, m_UID.c_str(), m_quant.c_str(), m_action.c_str(), rbuffer2);
-		cxrReportUrlB.Clear();
-	}
+        sprintf_s(szPureURL,
+                  2048,
+                  "%sscript=installer.php&CODE=PUTGQ&UID=%s&quant=%s&action=%s&rnd=%s",
+                  "random_string_16",
+                  m_UID.c_str(),
+                  m_quant.c_str(),
+                  m_action.c_str(),
+                  "random_string_30______________");
+    }
 
-	CXRString key(CXR_EAS_KEY);
-	std::string strQueryEncrypted = URLCipher::WrapperEncrypt((unsigned char*)SecureBuffer, dwResultSize, key.DecryptRaw());
-	#ifndef _DEBUG
-	SecureZeroMemory((byte *) SecureBuffer, sizeof(SecureBuffer) );
-	#endif _DEBUG
-	
-	std::string strURI = _T("https://");
-	strURI += cxrMainDomain.DecryptRaw();
-	
-	strURI += _T("/?");
-	strURI += strQueryEncrypted;
-	
-	#if defined(_DEBUG) && defined(IC_DBG_PRINT)
-	byte *ptr = (byte *) SecureBuffer;
-	for(unsigned int i = 0; i < dwResultSize; i++)
-		*(ptr++) ^= 0xAA; 
-	PRINT_LOG("\r\n------\r\nlen = %u (max_1024); url = %s\r\nSecBuf ^ AA -> %s\r\nResultingUrl-> %s\r\n------", strURI.length(), url, SecureBuffer, strURI.c_str());
+    cbPureURL = strlen(szPureURL);
+    for(unsigned int i = 0; i < cbPureURL; i++)
+    {
+        szPureURL[i] = szPureURL[i] ^ 0xAA;
+    }
 
-	SecureZeroMemory((byte *) SecureBuffer, sizeof(SecureBuffer) );
-	#endif
+    std::string strQueryEncrypted = URLCipher::WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
+                                                              cbPureURL,
+                                                              "CA1F5D1C32B5B621EE824AE5328DA");
 
-	// ! Assumes that the size of url buffer is equal to 1024 or larger:
-	// @ 
-	sprintf_s(url, 1024, _T("%s"), strURI.c_str());
-	
+    std::string strURI = "https://";
+    strURI += cxrMainDomain;
+
+    strURI += "/?";
+    strURI += strQueryEncrypted;
+
+    sprintf_s(url, 1024, "%s", strURI.c_str());
 }
 
 void InetClient::CreateRawUrl(char *url, const char *cxr, const char *param, bool withQuant)
@@ -869,7 +780,7 @@ void InetClient::CreateRawUrl(char *url, const char *cxr, const char *param, boo
 	DWORD SecureBuffer[IC_SEC_BUF_SIZE];
 	DWORD dwResultSize = 0;
 
-	CXRString cxrURL(cxr);
+    std::string cxrURL(cxr);
 	
 	// first 16 bytes
 	char rbuffer1[256] = {0};
@@ -878,8 +789,7 @@ void InetClient::CreateRawUrl(char *url, const char *cxr, const char *param, boo
 	// the rnd param
 	char rbuffer2[256] = {0};
 	
-	unsigned int size;
-	rand_s(&size);
+    unsigned int size = QRandomGenerator::global()->generate();
 	
 	InetClient::gen_random(rbuffer2, 30 + size % 30);
 
@@ -888,29 +798,26 @@ void InetClient::CreateRawUrl(char *url, const char *cxr, const char *param, boo
 	// create the url :
 	if (withQuant)
 	{
-		SecureSprintf(SecureBuffer, &dwResultSize, cxrURL.DecryptXOR(), rbuffer1, sparam.c_str(), m_quant.c_str(), rbuffer2, NULL);
-		cxrURL.Clear();		
+        SecureSprintf(SecureBuffer, &dwResultSize, cxrURL.c_str(), rbuffer1, sparam.c_str(), m_quant.c_str(), rbuffer2, NULL);
 	}
 	else
 	{
-		if ( sparam.length() > 0)	
-		{ 
-			sparam.insert(0, _T("&"));
+        if ( sparam.length() > 0)
+        {
+            sparam.insert(0, "&");
 		}
-		SecureSprintf(SecureBuffer, &dwResultSize, cxrURL.DecryptXOR(), rbuffer1, sparam.c_str(), rbuffer2, NULL, NULL);
-		cxrURL.Clear();
+        SecureSprintf(SecureBuffer, &dwResultSize, cxrURL.c_str(), rbuffer1, sparam.c_str(), rbuffer2, nullptr, nullptr);
 	}
 
-	CXRString key(CXR_EAS_KEY);
-	std::string strQueryEncrypted = URLCipher::WrapperEncrypt( (byte *) SecureBuffer, dwResultSize, key.DecryptRaw());
+    std::string strQueryEncrypted = URLCipher::WrapperEncrypt( (byte *) SecureBuffer, dwResultSize, "CA1F5D1C32B5B621EE824AE5328DA");
     #ifndef _DEBUG
 	SecureZeroMemory((byte *) SecureBuffer, sizeof(SecureBuffer) );
-	#endif	
+    #endif
 
-	std::string strURI = _T("https://");
-	strURI += cxrMainDomain.DecryptRaw();
+    std::string strURI = "https://";
+    strURI += cxrMainDomain;
 
-	strURI += _T("/?");
+    strURI += "/?";
 	strURI += strQueryEncrypted;
 
 	#if defined(_DEBUG) && defined(IC_DBG_PRINT)
@@ -924,7 +831,7 @@ void InetClient::CreateRawUrl(char *url, const char *cxr, const char *param, boo
 
 	// ! Assumes that the size of url buffer is equal to 1024 or larger:
 	// @ 
-	sprintf_s(url, 1024, _T("%s"), strURI.c_str());
+    sprintf_s(url, 1024, "%s", strURI.c_str());
 	
 }
 
@@ -958,7 +865,7 @@ void InetClient::SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *sour
 			int plen = strlen( param[pindex] );
 			for (int j = 0 ; j < plen; j++)
 			{
-				pbuff[ *dwResultSize ] = param[pindex][j] ^ 0xAA ;
+                pbuff[ *dwResultSize ] = param[pindex][j];
 				(*dwResultSize)++;
 				
 				// ! safe secure size, it doesn't take in account that the buffer is of DWORD type:
@@ -995,35 +902,32 @@ void InetClient::SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *sour
 
 std::string InetClient::GenerateGuid()
 {
-	CXRString str(CXR_formatGUID);
 	GUID guid;
 	HRESULT hCreateGuid = CoCreateGuid(&guid);
-	TCHAR szBuf[256];
+    char szBuf[256];
 
-	// <JUNK CODE>
-
-	sprintf_s(szBuf, 256, str.DecryptRaw(), guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+    sprintf_s(szBuf, 256, "%08lX%04hX%04hX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
 	
 	return std::string(szBuf);
 }
 
 const char *InetClient::getDomain()
 {
-	return cxrMainDomain.DecryptRaw();
+    return cxrMainDomain.c_str();
 }
 
 std::string InetClient::SendReport(int id)
 {
 	std::string response;
-	TCHAR url[1024] = { 0 };
+    char url[1024] = { 0 };
 	
-	sprintf_s(url, _T("a:%i"), id);
+    sprintf_s(url, "a:%i", id);
 	
 	ProcessURL(url);
 	
 	if (!SendGetRequest(url, response))
 	{
-		response = "error";	
+        response = "error";
 	}
 
 #ifdef _DEBUG
@@ -1041,15 +945,15 @@ std::string InetClient::SendReport(int id)
 std::string InetClient::SendReportWithParam(const char *szPath, const char *szParam)
 {
 	std::string response;
-	TCHAR url[1024] = { 0 };
+    char url[1024] = { 0 };
 	
-	sprintf_s(url, _T("%s:%s"), szPath, szParam);
+    sprintf_s(url, "%s:%s", szPath, szParam);
 	
 	ProcessURL(url);
 	
 	if ( ! SendGetRequest(url, response) )
 	{
-		response = "error";	
+        response = "error";
 	}
 	
 	return response;
@@ -1077,16 +981,14 @@ bool InetClient::Send2142SpecialFeedBack()
 bool InetClient::CheckDomainConnection()
 {
 	std::string response;
-	CXRString cxrStr(CXR_HTTPS_SL);
-	
-	std::string url = cxrStr.DecryptRaw();
+    std::string url = "https://";
 	
 	url += getDomain();
 	
 	// !!! SendGetRequest makes three attempts now:
 	if ( ! SendGetRequest(url.c_str(), response))
 	{
-		SLEEP(1000);
+        Sleep(1000);
 		
 		if ( ! SendGetRequest(url.c_str(), response))
 		{
@@ -1095,12 +997,8 @@ bool InetClient::CheckDomainConnection()
 			// ! some hostings return '1', some return "1\r\n" in response:
 			if (!(response.length() > 0 && response.length() < 4 && response[0] == '1'))
 			{
-				// failed internet connection:
-				cxrStr.SetValue(CXR_INET_NOT_FOUND);
-				CXRString cxrStrError(CXR_ERROR);
 				
-				MessageBox(NULL, cxrStr.DecryptRaw(), cxrStrError.DecryptRaw(), MB_OK | MB_ICONERROR);
-				
+                MessageBoxA(nullptr, "Internet connection not found.", "Error", MB_OK | MB_ICONERROR);
 				return false;
 			}
 		}
@@ -1113,29 +1011,24 @@ bool InetClient::CheckSSLCertificate(int action)
 	std::string response;
 	std::string strCertificate;
 
-	TCHAR url[1024] = { 0 };
+    char url[1024] = { 0 };
 	
-	sprintf_s(url, _T("a:%i"), action);
+    sprintf_s(url, "a:%i", action);
 	
 	ProcessURL(url);
 	
 	if ( SendGetRequestWithSSLCert(url, response, strCertificate) )
 	{
-		CXRString ccxrCertificate(CXR_SSL_CERT1);
-		
-		if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) {
+        if( strCertificate.find("C=US, S=CA, L=San Francisco, O=\"CloudFlare, Inc.\", CN=CloudFlare Inc ECC CA-2") != std::string::npos) {
 			return true;
 		} else {
-			ccxrCertificate.SetValue(CXR_SSL_CERT2);
-			if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) {
+            if( strCertificate.find("C=US, S=CA, L=San Francisco, O=\"CloudFlare, Inc.\", CN=CloudFlare Inc RSA CA-1") != std::string::npos) {
 				return true;
 			} else {
-				ccxrCertificate.SetValue(CXR_SSL_CERT3);
-				if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) {
+                if( strCertificate.find("C=US, ST=CA, L=San Francisco, O=CloudFlare, Inc., CN=CloudFlare") != std::string::npos) {
 					return true;
 				} else {
-					ccxrCertificate.SetValue(CXR_SSL_CERT4);
-					if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) {
+                    if( strCertificate.find("C=US, O=Let's Encrypt, CN=Let's Encrypt") != std::string::npos) {
 						return true;
 					}
 				}
@@ -1150,16 +1043,14 @@ bool InetClient::CheckDomainConnectionAndSSL(bool& SSLSuccess)
 	SSLSuccess = false;
 	std::string strCertificate;
 	std::string response;
-	CXRString cxrStr(CXR_HTTPS_SL);
-
-	std::string url = cxrStr.DecryptRaw();
+    std::string url = "https://";
 
 	url += getDomain();
 
 	// !!! SendGetRequest makes three attempts now:
 	if (!SendGetRequestWithSSLCert(url.c_str(), response, strCertificate))
 	{
-		SLEEP(1000);
+        Sleep(1000);
 
 		if (!SendGetRequestWithSSLCert(url.c_str(), response, strCertificate))
 		{
@@ -1168,38 +1059,31 @@ bool InetClient::CheckDomainConnectionAndSSL(bool& SSLSuccess)
 			// ! some hostings return '1', some return "1\r\n" in response:
 			if (!(response.length() > 0 && response.length() < 4 && response[0] == '1'))
 			{
-				// failed internet connection:
-				cxrStr.SetValue(CXR_INET_NOT_FOUND);
-				CXRString cxrStrError(CXR_ERROR);
-				MessageBox(NULL, cxrStr.DecryptRaw(), cxrStrError.DecryptRaw(), MB_OK | MB_ICONERROR);
+                MessageBoxA(nullptr, "Internet connection not found.", "Error", MB_OK | MB_ICONERROR);
 				return false;
 			}
 		}
 	}
 	
-	CXRString ccxrCertificate(CXR_SSL_CERT1);
-	if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) 
+    if( strCertificate.find("C=US, S=CA, L=San Francisco, O=\"CloudFlare, Inc.\", CN=CloudFlare Inc ECC CA-2") != std::string::npos)
 	{
 		SSLSuccess = true;
-	} 
-	else 
+    }
+    else
 	{
-		ccxrCertificate.SetValue(CXR_SSL_CERT2);
-		if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) 
+        if( strCertificate.find("C=US, S=CA, L=San Francisco, O=\"CloudFlare, Inc.\", CN=CloudFlare Inc RSA CA-1") != std::string::npos)
 		{
 			SSLSuccess = true;
-		} 
-		else 
+        }
+        else
 		{
-			ccxrCertificate.SetValue(CXR_SSL_CERT3);
-			if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) 
+            if( strCertificate.find("C=US, ST=CA, L=San Francisco, O=CloudFlare, Inc., CN=CloudFlare") != std::string::npos)
 			{
 				SSLSuccess = true;
-			} 
-			else 
+            }
+            else
 			{
-				ccxrCertificate.SetValue(CXR_SSL_CERT4);
-				if( strCertificate.find(ccxrCertificate.DecryptRaw()) != std::string::npos) 
+                if( strCertificate.find("C=US, O=Let's Encrypt, CN=Let's Encrypt") != std::string::npos)
 				{
 					SSLSuccess = true;
 				}
@@ -1209,7 +1093,3 @@ bool InetClient::CheckDomainConnectionAndSSL(bool& SSLSuccess)
 
 	return true;
 }
-
-
-
-//

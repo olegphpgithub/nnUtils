@@ -1,6 +1,8 @@
 #include "formdomainutilities.h"
 #include "ui_formdomainutilities.h"
 
+#include "DomainUtilities/InetClient.h"
+
 #include <QtWidgets>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -30,8 +32,12 @@ FormDomainUtilities::~FormDomainUtilities()
 void FormDomainUtilities::ValidateDomain()
 {
     ui->resultTextEdit->append(tr("Working..."));
-    QString urlText = ui->domainNameLineEdit->text().trimmed();
-    m_manager.get(QNetworkRequest(QUrl(urlText)));
+    InetClient ic;
+    ic.SendReport(1u);
+    // std::string response;
+    // ic.SendRequest("https://www.google.com", response, InetClient::GET, "", false);
+    // MessageBoxA(NULL, response.c_str(), "2", MB_OK);
+    // ui->resultTextEdit->append()
 }
 
 void FormDomainUtilities::replyFinished()

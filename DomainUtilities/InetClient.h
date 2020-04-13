@@ -6,16 +6,25 @@
 */
 #pragma once
 
+#include <Windows.h>
 
 #include <locale>         // std::locale, std::tolower
 #include <vector>
 #include "wincrypt.h"
-#include "CXRString.h"
 #include "TinyAES.h"
 #include "URLCipher.h"
-#include "MD5.h"
-#include "PrintLog.h"
 #include <list>
+
+#define _CRT_RAND_S
+#include <stdlib.h>
+#include <stdio.h>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+
+
+#include <WinInet.h>
+#include <Winineti.h>
 
 // Turns on debug output for this module:
 #define IC_DBG_PRINT
@@ -83,9 +92,9 @@ public:
 	bool        CheckDomainConnection();
 	bool        CheckDomainConnectionAndSSL(bool& SSLSuccess);
 	
-	CXRString cxrMainDomain;
-	CXRString cxrReportUrlA;
-	CXRString cxrReportUrlB;
+    std::string cxrMainDomain;
+    std::string cxrReportUrlA;
+    std::string cxrReportUrlB;
 
 	std::string m_action;
 	std::string m_UID;
@@ -121,26 +130,29 @@ public:
 	DWORD			m_dwErr;
 	std::string		m_sUserAgent;
 	bool			m_bConnected;
-	TCHAR			m_szSSLCert[IC_SSL_CERT_BUF_SIZE];
+    char			m_szSSLCert[IC_SSL_CERT_BUF_SIZE];
 
 	bool			Connect(const std::string &host, int port, DWORD dwAccessType);
 	bool			Disconnect();
 	
 	// Splits URL into scheme, host, port and query:
-	bool			ParseURL(const std::string &url, InetClient::Scheme &scheme, std::string &host, int &port, std::string &query);
+    bool ParseURL(const std::string &url,
+                  InetClient::Scheme &scheme,
+                  std::string &host,
+                  unsigned int &port,
+                  std::string &query);
     
 	unsigned int	GetDefaultPort(const Scheme &scheme);
 	std::string		GetRequestMethod(const RequestMethod &requestMethod);
 
 	// Sends GET or POST request and returns response:
-	bool			SendRequest(const std::string &url, std::string &response, const RequestMethod requestMethod = RequestMethod::GET, const std::string &postData = _T(""), bool bGetSSLCert = false);
+    bool			SendRequest(const std::string &url,
+                                std::string &response,
+                                const RequestMethod requestMethod = RequestMethod::GET,
+                                const std::string &postData = "",
+                                bool bGetSSLCert = false);
 
 private:
-	// Registry helper function to track proxy settings:
-	DWORD GetRegistryDwordValue(HKEY hive, std::string subKey, std::string value);
-	std::string GetRegistryStringValue(HKEY hive, std::string subKey, std::string value);
-    
-	// own copy of the function from RandomNumber.h
 	void gen_random(char *s, const int len);
 
 };
