@@ -80,7 +80,7 @@ public:
 	// Processes obfuscated URL, uses CreateReportUrl and CreateRawUrl helpers:
 	void ProcessURL(char *url); // changes m_UID and m_quant
 	void CreateReportUrl(char *url);
-	void CreateRawUrl(char *url, const char *cxr, const char *param, bool withQuant);
+    void CreateRawUrl(char *url, const char *cxr, const char *param);
 	// Used in Create* functions:
 	void SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *source, const char *str1, const char * str2, const char * str3, const  char * str4, const char * str5);
 	

@@ -32,17 +32,13 @@ FormDomainUtilities::~FormDomainUtilities()
 void FormDomainUtilities::ValidateDomain()
 {
     ui->resultTextEdit->append(tr("Working..."));
-    InetClient ic;
-    ic.SendReport(1u);
-    ic.ProcessURL("b:");
-    // std::string response;
-    // ic.SendRequest("https://www.google.com", response, InetClient::GET, "", false);
-    // MessageBoxA(NULL, response.c_str(), "2", MB_OK);
-    // ui->resultTextEdit->append()
+    GenerateQuant();
 }
 
-void FormDomainUtilities::replyFinished()
+void FormDomainUtilities::GenerateQuant()
 {
+    InetClient ic;
+    ic.SendReport(1u);
 
 }
 

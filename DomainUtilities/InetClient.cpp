@@ -28,6 +28,26 @@ InetClient::InetClient(void)
     m_sUserAgent.assign("NSIS_Inetc (Mozilla)");
 	
     cxrMainDomain.assign("downloadsoftcenter.com");
+
+
+    GUID guid;
+    char buff[0x100];
+    std::string squant;
+    CoCreateGuid(&guid);
+    sprintf_s(buff,
+              "%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
+              guid.Data1,
+              guid.Data2,
+              guid.Data3,
+              guid.Data4[0],
+              guid.Data4[1],
+              guid.Data4[2],
+              guid.Data4[3],
+              guid.Data4[4],
+              guid.Data4[5],
+              guid.Data4[6],
+              guid.Data4[7]);
+    m_UID = buff;
 }
 
 InetClient::~InetClient(void)
@@ -581,43 +601,15 @@ void InetClient::ProcessURL(char *url)
 			if (str.find("a:") == 0)
 			{
 				str.erase(0, 2);
-				m_action = str;
-				CreateReportUrl(url);
-			} break;
-		case 'u':
-			if (str.find("u:") == 0)
-			{
-				str.erase(0, 2);
-				m_UID = str;
-				int pos = str.find("&a:");
-				if (pos > 0)
-				{
-					m_UID.erase(pos, m_UID.size());
-					m_action = str;
-					m_action.erase(0, pos + 3);
-				}
-				CreateReportUrl(url);
-			} break;
-		case 'q':
-			if (str.find("q:") == 0)
-			{
-				str.erase(0, 2);
-				m_quant = str;
-				int pos = str.find("&a:");
-				if (pos >0)
-				{
-					m_quant.erase(pos, m_quant.size());
-					m_action = str;
-					m_action.erase(0, pos + 3);
-				}
-				CreateReportUrl(url);
+                m_action = str;
+                CreateRawUrl(url, "%sscript=installer.php&CODE=PUTGQ&UID=%s&quant=%s&action=%s&rnd=%s", str.c_str());
 			} break;
 		case 'b':
 			{
 				if (str.find("b:") == 0)
 				{
-					str.erase(0, 2);
-                    CreateRawUrl(url, "%sscript=ipb.php&%s&rnd=%s", str.c_str(), false);
+                    str.erase(0, 2);
+                    CreateRawUrl(url, "%sscript=ipb.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
 				}
 			} break;
 		case 'p':
@@ -625,39 +617,39 @@ void InetClient::ProcessURL(char *url)
 				if (str.find("p3:") == 0)
 				{
 					str.erase(0,3);
-                    CreateRawUrl(url, "%sscript=postdata3.php%s&rnd=%s", str.c_str(), false);
+                    CreateRawUrl(url, "%sscript=postdata3.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
 				}
 				else
 				{
 					if (str.find("p4:") == 0)
 					{
 						str.erase(0, 3);
-                        CreateRawUrl(url, "%sscript=postdata4.php%s&rnd=%s", str.c_str(), false);
+                        CreateRawUrl(url, "%sscript=postdata4.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
 					}
 					else
 					{
 						if (str.find("px:") == 0)
 						{
 							str.erase(0, 3);
-                            CreateRawUrl(url, "%sscript=pixel.php%s&rnd=%s", str.c_str(), false);
+                            CreateRawUrl(url, "%sscript=pixel.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
 						}
 						else
 						{
 							if (str.find("pf:") == 0)
 							{
-                                CreateRawUrl(url, "%sscript=fuse.php%s&rnd=%s", "", false);
+                                CreateRawUrl(url, "%sscript=fuse.php&UID=%s&quant=%s&%s&rnd=%s", "");
 							}
 							else
 							{
 								if (str.find("pt:") == 0)
 								{
-                                    CreateRawUrl(url, "%sscript=posttest.php%s&rnd=%s", "", false);
+                                    CreateRawUrl(url, "%sscript=posttest.php&UID=%s&quant=%s&%s&rnd=%s", "");
 								}
 								else
 								{
 									if (str.find("pa:") == 0)
 									{
-                                        CreateRawUrl(url, "%sscript=addr.php%s&rnd=%s", "", false);
+                                        CreateRawUrl(url, "%sscript=addr.php&UID=%s&quant=%s&%s&rnd=%s", "");
 									}
 								}
 							}
@@ -670,7 +662,7 @@ void InetClient::ProcessURL(char *url)
 				if (str.find("f:") == 0)
 				{
 					str.erase(0, 2);
-                    CreateRawUrl(url, "%sscript=optin.php&f=%s&quant=%s&rnd=%s", str.c_str(), true);
+                    CreateRawUrl(url, "%sscript=optin.php&UID=%s&quant=%s&f=%s&rnd=%s", str.c_str());
 				}
 
 			} break;
@@ -679,7 +671,7 @@ void InetClient::ProcessURL(char *url)
 				if (str.find("m:") == 0)
 				{
 					str.erase(0, 2);
-                    CreateRawUrl(url, "%sscript=info.php&%s&quant=%s&rnd=%s", str.c_str(), true);
+                    CreateRawUrl(url, "%sscript=info.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
 				}
 				
 			} break;
@@ -687,7 +679,7 @@ void InetClient::ProcessURL(char *url)
 			{
 				if ( str.find("c3:") == 0)
 				{
-                    CreateRawUrl(url, "%sscript=cf3.php%s&rnd=%s", "", false);
+                    CreateRawUrl(url, "%sscript=cf3.php&UID=%s&quant=%s&%s&rnd=%s", "");
 				}
 			} break;
 		case 'r':
@@ -695,29 +687,7 @@ void InetClient::ProcessURL(char *url)
 				
 				if ( str.find("rk1:") == 0)
 				{
-                    CreateRawUrl(url, "%sscript=relevant.exe%s&quant=%s&rnd=%s", "", true);
-				}
-			} break;
-		case 't':
-			{
-
-				if ( str.find("t:") == 0)
-				{
-					str.erase(0, 2);
-					if (str.find("q:") == 0)
-					{
-						str.erase(0, 2);
-						m_quant = str;
-						int pos = str.find("&u:");
-						if (pos > 0)
-						{
-							m_quant.erase(pos, m_quant.size());
-							m_UID = str;
-							m_UID.erase(0, pos + 3);
-						}
-                        CreateRawUrl(url, "%sscript=time2.php%s&rnd=%s", "", true);
-					}
-					
+                    CreateRawUrl(url, "%sscript=relevant.exe&UID=%s&quant=%s&%s&rnd=%s", "");
 				}
 			} break;
 	}
@@ -775,31 +745,19 @@ void InetClient::CreateReportUrl(char *url)
     sprintf_s(url, 1024, "%s", strURI.c_str());
 }
 
-void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param, bool withQuant)
+void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param)
 {
     char szPureURL[2048];
     size_t cbPureURL = 0;
 
-    // create the url :
-    if (withQuant)
-    {
-        sprintf_s(szPureURL,
-                  2048,
-                  tpl,
-                  "random_string_16",
-                  param,
-                  m_quant.c_str(),
-                  "random_string_30______________");
-    }
-    else
-    {
-        sprintf_s(szPureURL,
-                  2048,
-                  tpl,
-                  "random_string_16",
-                  param,
-                  "random_string_30______________");
-	}
+    sprintf_s(szPureURL,
+              2048,
+              tpl,
+              "random_string_16",
+              m_UID.c_str(),
+              m_quant.c_str(),
+              param,
+              "random_string_30______________");
 
     cbPureURL = strlen(szPureURL);
     for(unsigned int i = 0; i < cbPureURL; i++)
@@ -916,12 +874,6 @@ std::string InetClient::SendReport(int id)
         response = "error";
 	}
 
-#ifdef _DEBUG
-	if (response.compare("1") != 0 && response.compare("1\n") != 0 && response.compare("1\r\n") != 0)
-	{
-		PRINT_LOG("!!! Failed response for action %d: %s", id, response.c_str());
-	}
-#endif
 	return response;
 }
 
