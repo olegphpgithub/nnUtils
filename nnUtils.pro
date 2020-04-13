@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     fileutility.cpp \
+    formdomainutilities.cpp \
     formfileutility.cpp \
     formstreameditor.cpp \
     main.cpp \
@@ -24,11 +25,13 @@ SOURCES += \
 
 HEADERS += \
     fileutility.h \
+    formdomainutilities.h \
     formfileutility.h \
     formstreameditor.h \
     mainwindow.h
 
 FORMS += \
+    formdomainutilities.ui \
     formfileutility.ui \
     formstreameditor.ui \
     mainwindow.ui
