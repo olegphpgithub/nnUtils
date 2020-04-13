@@ -16,6 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    DomainUtilities/Base64.cpp \
+    DomainUtilities/InetClient.cpp \
+    DomainUtilities/TinyAES.cpp \
+    DomainUtilities/URLCipher.cpp \
     fileutility.cpp \
     formdomainutilities.cpp \
     formfileutility.cpp \
@@ -24,6 +28,10 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    DomainUtilities/Base64.h \
+    DomainUtilities/InetClient.h \
+    DomainUtilities/TinyAES.h \
+    DomainUtilities/URLCipher.h \
     fileutility.h \
     formdomainutilities.h \
     formfileutility.h \
