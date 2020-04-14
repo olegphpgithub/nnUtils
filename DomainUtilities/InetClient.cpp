@@ -292,10 +292,32 @@ bool InetClient::SendRequest(const std::string &url,
 		m_dwErr = GetLastError();
 		InternetCloseHandle(hRequest);
 		Disconnect();
-		
-		return false;
+
+        TCHAR lpszMessage[1024];
+        TCHAR lpszCause[1024];
+        if(m_dwErr == ERROR_INTERNET_NAME_NOT_RESOLVED)
+
+        _sntprintf_s(lpszMessage, 1024, _TRUNCATE, TEXT("HttpSendRequest failed with code 0x%X"), m_dwErr);
+        throw new CppException(lpszMessage, m_dwErr);
 	}
-			
+
+    DWORD statusCode = 0;
+    DWORD length = sizeof(DWORD);
+    HttpQueryInfo(hRequest,
+                  HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
+                  &statusCode,
+                  &length,
+                  nullptr);
+
+    if(statusCode != 200) {
+        m_dwErr = GetLastError();
+        InternetCloseHandle(hRequest);
+        Disconnect();
+        TCHAR lpszMessage[1024] = {0};
+        _sntprintf_s(lpszMessage, 1024, _TRUNCATE, TEXT("Bad status code %d"), statusCode);
+        throw new CppException(lpszMessage, m_dwErr);
+    }
+
 	if (bGetSSLCert)
 	{
         PCCERT_CHAIN_CONTEXT CertCtxPtr = nullptr;
