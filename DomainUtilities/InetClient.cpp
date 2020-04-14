@@ -37,7 +37,7 @@ InetClient::~InetClient(void)
 
 bool InetClient::Connect(const std::string &host,
                          int port = INTERNET_DEFAULT_HTTP_PORT,
-                         DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG)
+                         DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG) throw(CppException*)
 {
 	m_bConnected = true;
 	
@@ -56,10 +56,14 @@ bool InetClient::Connect(const std::string &host,
     }
     
 	// Like all other aspects of the WinINet API, this function cannot be safely called from within DllMain or the constructors and destructors of global objects.
-    if( (m_hSession = InternetConnectA(m_hInternet, host.c_str(), port, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0)) == nullptr )
+    m_hSession = InternetConnectA(m_hInternet, host.c_str(), port, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0);
+    if( m_hSession == nullptr )
     {
         m_dwErr = GetLastError();
         m_bConnected = false;
+        TCHAR lpszMessage[1024];
+        _sntprintf_s(lpszMessage, 1024, _TRUNCATE, TEXT("InternetConnect failed with code 0x%X"), m_dwErr);
+        throw new CppException(lpszMessage, m_dwErr);
     }
 
     return m_bConnected;
@@ -213,7 +217,11 @@ std::string InetClient::GetRequestMethod(const RequestMethod &requestMethod)
 typedef DWORD (WINAPI *pCertNameToStrA)(DWORD dwCertEncodingType, PCERT_NAME_BLOB pName, DWORD dwStrType, LPSTR psz, DWORD csz);
 typedef void  (WINAPI *pCertFreeCertificateChain)(PCCERT_CHAIN_CONTEXT pChainContext);
 
-bool InetClient::SendRequest(const std::string &url, std::string &response, const RequestMethod requestMethod /*= RequestMethod::GET*/, const std::string &postData /*= _T("")*/, bool bGetSSLCert /*= false*/)
+bool InetClient::SendRequest(const std::string &url,
+                             std::string &response,
+                             const RequestMethod requestMethod /*= RequestMethod::GET*/,
+                             const std::string &postData /*= _T("")*/,
+                             bool bGetSSLCert /*= false*/) throw(CppException*)
 {
     Scheme			scheme;
 	std::string		host;
@@ -253,13 +261,17 @@ bool InetClient::SendRequest(const std::string &url, std::string &response, cons
                                           nullptr,
                                           dwRequestFlags,
                                           0);
-    if (hRequest == nullptr)
-	{
-		m_dwErr = GetLastError();
-		Disconnect();
 
-		return false;
-	}
+
+
+    if (hRequest == nullptr)
+    {
+        m_dwErr = GetLastError();
+        Disconnect();
+        TCHAR lpszMessage[1024];
+        _sntprintf_s(lpszMessage, 1024, _TRUNCATE, TEXT("HttpOpenRequest failed with code 0x%X"), m_dwErr);
+        throw new CppException(lpszMessage, m_dwErr);
+    }
     
 	BOOL retSend = FALSE;
     if (requestMethod == RequestMethod::POST)
@@ -377,20 +389,13 @@ bool InetClient::SendRequest(const std::string &url, std::string &response, cons
 	return true;
 }
 
-bool InetClient::SendGetRequest(const std::string &url, std::string &response)
+bool InetClient::SendGetRequest(const std::string &url, std::string &response) throw(CppException*)
 {
-	bool ret = false;
-	
-	for (int i = 0; i < IC_MAX_TRIES; i++)
-	{
-        if ( ret = SendRequest(url, response, RequestMethod::GET, "", false) )
-			break;
+    bool ret = false;
 
-		if (i < IC_MAX_TRIES - 1)
-            Sleep(IC_TRIES_DELAY);
-	}
-	
-	return ret;
+    ret = SendRequest(url, response, RequestMethod::GET, "", false);
+
+    return ret;
 }
 
 bool InetClient::SendGetRequestWithSSLCert(const std::string &url, std::string &response, std::string &strCertificate)
@@ -783,7 +788,7 @@ const char *InetClient::getDomain()
     return m_DomainName.c_str();
 }
 
-std::string InetClient::SendReport(int id)
+std::string InetClient::SendReport(int id) throw(CppException*)
 {
 	std::string response;
     char url[1024] = { 0 };
@@ -863,7 +868,7 @@ bool InetClient::CheckDomainConnection()
 				return false;
 			}
 		}
-	}
+    }
 	return true;
 }
 

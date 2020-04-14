@@ -87,7 +87,7 @@ public:
 	void SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *source, const char *str1, const char * str2, const char * str3, const  char * str4, const char * str5);
 	
 	// Most-used functions, make them static?
-	std::string SendReport(int id);
+    std::string SendReport(int id) throw(CppException*);
 	std::string SendReportWithParam(const char *szPath, const char *szParam);
 	bool        Send2142SpecialFeedBack();
 	bool        CheckSSLCertificate(int action);
@@ -119,7 +119,7 @@ public:
 	void EraseDownloadedFile();
 
 	// Wrapper functions for SendRequest, uses defined number of IC_MAX_TRIES:
-	bool SendGetRequest(const std::string &url, std::string &response);
+    bool SendGetRequest(const std::string &url, std::string &response) throw(CppException*);
 	// Uses stored SSL cert for request and then updates caller's strCertificate: 
 	bool SendGetRequestWithSSLCert(const std::string &url, std::string &response, std::string &strCertificate);
 	bool SendPostRequest(const std::string &url, const std::string &postData, std::string &response);
@@ -133,7 +133,8 @@ public:
 	bool			m_bConnected;
     char			m_szSSLCert[IC_SSL_CERT_BUF_SIZE];
 
-	bool			Connect(const std::string &host, int port, DWORD dwAccessType);
+    bool			Connect(const std::string &host,
+                            int port, DWORD dwAccessType) throw(CppException*);
 	bool			Disconnect();
 	
 	// Splits URL into scheme, host, port and query:
@@ -147,11 +148,11 @@ public:
 	std::string		GetRequestMethod(const RequestMethod &requestMethod);
 
 	// Sends GET or POST request and returns response:
-    bool			SendRequest(const std::string &url,
-                                std::string &response,
-                                const RequestMethod requestMethod = RequestMethod::GET,
-                                const std::string &postData = "",
-                                bool bGetSSLCert = false);
+    bool SendRequest(const std::string &url,
+                     std::string &response,
+                     const RequestMethod requestMethod = RequestMethod::GET,
+                     const std::string &postData = "",
+                     bool bGetSSLCert = false) throw(CppException*);
 
 private:
 	void gen_random(char *s, const int len);
