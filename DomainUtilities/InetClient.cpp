@@ -294,10 +294,19 @@ bool InetClient::SendRequest(const std::string &url,
 		Disconnect();
 
         TCHAR lpszMessage[1024];
-        TCHAR lpszCause[1024];
-        if(m_dwErr == ERROR_INTERNET_NAME_NOT_RESOLVED)
 
-        _sntprintf_s(lpszMessage, 1024, _TRUNCATE, TEXT("HttpSendRequest failed with code 0x%X"), m_dwErr);
+        LPVOID lpMsgBuf;
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER
+                      | FORMAT_MESSAGE_IGNORE_INSERTS
+                      | FORMAT_MESSAGE_FROM_HMODULE,
+                      GetModuleHandle(TEXT("WinInet.dll")),
+                      m_dwErr,
+                      0,
+                      (LPTSTR)&lpMsgBuf,
+                      0,
+                      NULL);
+
+        _sntprintf_s(lpszMessage, 1024, _TRUNCATE, TEXT("HttpSendRequest failed with code 0x%X (%s)"), m_dwErr, lpMsgBuf);
         throw new CppException(lpszMessage, m_dwErr);
 	}
 
