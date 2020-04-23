@@ -1,7 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include <vector>
 #include <windows.h>
+
+typedef std::vector<std::basic_string<TCHAR> > StackTrace;
 
 #define ERROR_REPORTING 1
 
@@ -16,17 +20,22 @@
 class CppException
 {
 public:
-    CppException(HRESULT hr);
-    CppException(LPCTSTR error, HRESULT hr);
-    CppException(LPCTSTR file, int line, LPCTSTR error, HRESULT hr);
+    CppException(CppException &obj);
     ~CppException(void);
+    CppException(LPCTSTR errmess,
+        DWORD errcode,
+        CppException *stack = NULL);
+    CppException(LPCTSTR file,
+        int line,
+        LPCTSTR errmess,
+        DWORD errcode,
+        CppException *stack = NULL);
+    std::vector<std::basic_string<TCHAR> > GetStackTrace();
+    static std::basic_string<TCHAR> GetFormatMessage(DWORD errcode);
     
-    void CppInitialize(void);
-    
-    static void log(HRESULT hr);
-    
-    TCHAR *wcFilePath;
-    int iLineCode;
-    TCHAR *wcError;
-    HRESULT herr;
+    TCHAR m_szFilePath[MAX_PATH];
+    int m_iLineCode;
+    TCHAR *m_szError;
+    DWORD m_dwErrno;
+    CppException *m_stack;
 };

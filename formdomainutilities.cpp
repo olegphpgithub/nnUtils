@@ -46,9 +46,9 @@ void FormDomainUtilities::ValidateDomain()
         ui->resultTextEdit->append(report);
     } catch (CppException *ex) {
 #       ifdef UNICODE
-            ui->resultTextEdit->append(QString::fromWCharArray(ex->wcError));
+            ui->resultTextEdit->append(QString::fromWCharArray(ex->m_szError));
 #       else
-            ui->resultTextEdit->append(QString::fromLatin1(ex->wcError));
+            ui->resultTextEdit->append(QString::fromLatin1(ex->m_szError));
 #       endif
     }
 

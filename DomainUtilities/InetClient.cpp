@@ -287,28 +287,20 @@ bool InetClient::SendRequest(const std::string &url,
         retSend = HttpSendRequestA(hRequest, NULL, 0, NULL, 0);
 	}
 
-	if (retSend == NULL)
-	{
-		m_dwErr = GetLastError();
-		InternetCloseHandle(hRequest);
-		Disconnect();
+    if (retSend == NULL)
+    {
+        m_dwErr = GetLastError();
+        InternetCloseHandle(hRequest);
+        Disconnect();
 
         TCHAR lpszMessage[1024];
-
-        LPVOID lpMsgBuf;
-        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER
-                      | FORMAT_MESSAGE_IGNORE_INSERTS
-                      | FORMAT_MESSAGE_FROM_HMODULE,
-                      GetModuleHandle(TEXT("WinInet.dll")),
-                      m_dwErr,
-                      0,
-                      (LPTSTR)&lpMsgBuf,
-                      0,
-                      NULL);
-
-        _sntprintf_s(lpszMessage, 1024, _TRUNCATE, TEXT("HttpSendRequest failed with code 0x%X (%s)"), m_dwErr, lpMsgBuf);
+        _sntprintf_s(lpszMessage,
+                     1024,
+                     _TRUNCATE,
+                     TEXT("HttpSendRequest failed. %s."),
+                     CppException::GetFormatMessage(m_dwErr).c_str());
         throw new CppException(lpszMessage, m_dwErr);
-	}
+    }
 
     DWORD statusCode = 0;
     DWORD length = sizeof(DWORD);
@@ -1057,8 +1049,6 @@ std::string InetClient::GenerateQuant() throw(CppException*)
         sprintf_s(buff, 0x100, "%lld", iQuant);
         return std::string(buff);
     } catch(CppException *ex) {
-        TCHAR szMessage[1024];
-        _stprintf_s(szMessage, 1024, TEXT("GenerateQuant failed: %s"), ex->wcError);
-        throw new CppException(szMessage, ex->herr);
+        throw new CppException(TEXT("GenerateQuant failed."), ex->m_dwErrno, ex);
     }
 }
