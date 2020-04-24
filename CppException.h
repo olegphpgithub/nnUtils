@@ -5,7 +5,7 @@
 #include <vector>
 #include <windows.h>
 
-typedef std::vector<std::basic_string<TCHAR> > StackTrace;
+typedef std::vector<std::basic_string<TCHAR> > ExceptionStackTrace;
 
 #define ERROR_REPORTING 1
 

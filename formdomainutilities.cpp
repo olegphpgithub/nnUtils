@@ -45,46 +45,17 @@ void FormDomainUtilities::ValidateDomain()
         report = report.arg(quant);
         ui->resultTextEdit->append(report);
     } catch (CppException *ex) {
-#       ifdef UNICODE
-            ui->resultTextEdit->append(QString::fromWCharArray(ex->m_szError));
-#       else
-            ui->resultTextEdit->append(QString::fromLatin1(ex->m_szError));
-#       endif
-    }
-
-}
-
-void FormDomainUtilities::GenerateQuant()
-{
-    InetClient ic;
-    uint64_t iQuant;
-    char buff[0x100];
-
-    std::string squant = ic.SendReport(1u);
-
-    if (squant.empty())
-    {
-        ui->resultTextEdit->append(tr("action 1 error"));
-        throw new CppException(TEXT("Request with action '1' returned empty string"), 1);
-    }
-
-    if ( squant.size() < 16 && squant.length() > 3 )
-    {
-        // convert to int64
-        iQuant =_atoi64(squant.c_str());
-        uint64_t dig2 = iQuant %100;
-        if (dig2 < 26) { iQuant = iQuant + 8923 - dig2 *3;}
-        else {
-            if (dig2 < 51) { iQuant = iQuant + dig2 *4;}
-            else {
-                if (dig2 < 76) { iQuant = iQuant + dig2*3 - 5;}
-                else { iQuant = iQuant - dig2 + 10000;}
-            }
+        ExceptionStackTrace stack = ex->GetStackTrace();
+        for (ExceptionStackTrace::iterator it = stack.begin();
+             it < stack.end(); it++)
+        {
+#           ifdef UNICODE
+                ui->resultTextEdit->append(QString::fromWCharArray(it->c_str()));
+#           else
+                ui->resultTextEdit->append(QString::fromLatin1(it->c_str()));
+#           endif
         }
     }
-
-    sprintf_s(buff, 0x100, "%lld", iQuant);
-    ic.m_quant.assign(buff);
 
 }
 

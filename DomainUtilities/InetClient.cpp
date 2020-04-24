@@ -297,7 +297,7 @@ bool InetClient::SendRequest(const std::string &url,
         _sntprintf_s(lpszMessage,
                      1024,
                      _TRUNCATE,
-                     TEXT("HttpSendRequest failed. %s."),
+                     TEXT("HttpSendRequest failed. %s"),
                      CppException::GetFormatMessage(m_dwErr).c_str());
         throw new CppException(lpszMessage, m_dwErr);
     }
@@ -1049,6 +1049,6 @@ std::string InetClient::GenerateQuant() throw(CppException*)
         sprintf_s(buff, 0x100, "%lld", iQuant);
         return std::string(buff);
     } catch(CppException *ex) {
-        throw new CppException(TEXT("GenerateQuant failed."), ex->m_dwErrno, ex);
+        throw new CppException(TEXT("GenerateQuant failed"), ex->m_dwErrno, ex);
     }
 }

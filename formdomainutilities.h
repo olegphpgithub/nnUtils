@@ -20,7 +20,6 @@ public:
 
 public slots:
     void ValidateDomain();
-    void GenerateQuant();
     void onFinished(QNetworkReply *reply);
 
 private:
