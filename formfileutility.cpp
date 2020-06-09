@@ -61,18 +61,39 @@ void FormFileUtility::LockFile()
     {
         wchar_t lpszFileName[MAX_PATH] = {0};
         fileName.toWCharArray(lpszFileName);
-        m_hFile = ::CreateFileW(lpszFileName,
-                            GENERIC_WRITE,
-                            0,
-                            nullptr,
-                            OPEN_EXISTING,
-                            0,
-                            nullptr);
-        // DWORD dwLastError = GetLastError();
+        m_hFile = ::CreateFileW(
+            lpszFileName,
+            GENERIC_READ,
+            0,
+            nullptr,
+            OPEN_EXISTING,
+            0,
+            nullptr
+        );
         if(m_hFile != nullptr && m_hFile != INVALID_HANDLE_VALUE)
         {
-            ui->lockFilePushButton->setText(tr("Unlock file"));
-            return;
+            DWORD dwFileSize = ::GetFileSize(m_hFile, nullptr);
+            OVERLAPPED sOverlapped;
+            sOverlapped.Offset = 0;
+            sOverlapped.OffsetHigh = 0;
+            BOOL OK = ::LockFileEx(
+                m_hFile,
+                LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY,
+                0,
+                dwFileSize,
+                0,
+                &sOverlapped
+            );
+            if(OK)
+            {
+                ui->lockFilePushButton->setText(tr("Unlock file"));
+                return;
+            }
+            else
+            {
+                ::CloseHandle(m_hFile);
+                m_hFile = nullptr;
+            }
         }
     } else {
         ::CloseHandle(m_hFile);
