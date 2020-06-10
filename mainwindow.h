@@ -15,6 +15,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void DisplayAlternateDataStreamEditor();
+    void DisplayLockFileUtility();
+    void DisplayCheckDomainUtility();
+
 private:
     Ui::MainWindow *ui;
 };

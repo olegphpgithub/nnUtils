@@ -23,18 +23,41 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile_utilities">
+   <widget class="QMenu" name="menuFileUtilities">
     <property name="title">
      <string>File utilities</string>
     </property>
-    <addaction name="actionLock_file"/>
+    <addaction name="actionLockFileUtility"/>
+    <addaction name="actionADSEditor"/>
    </widget>
-   <addaction name="menuFile_utilities"/>
+   <widget class="QMenu" name="menuDomainUtilities">
+    <property name="title">
+     <string>Domain utilities</string>
+    </property>
+    <addaction name="actionCheckDomainUtility"/>
+   </widget>
+   <addaction name="menuFileUtilities"/>
+   <addaction name="menuDomainUtilities"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionLock_file">
+  <action name="actionLockFileUtility">
    <property name="text">
     <string>Lock file</string>
+   </property>
+  </action>
+  <action name="actionADSEditor">
+   <property name="text">
+    <string>ADS editor</string>
+   </property>
+  </action>
+  <action name="actionDomain_utilities">
+   <property name="text">
+    <string>Domain utilities</string>
+   </property>
+  </action>
+  <action name="actionCheckDomainUtility">
+   <property name="text">
+    <string>Check domain utility</string>
    </property>
   </action>
  </widget>

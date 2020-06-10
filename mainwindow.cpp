@@ -9,16 +9,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    // FormStreamEditor *fse = new FormStreamEditor();
-    // setCentralWidget(fse);
-
-    // FormFileUtility *f = new FormFileUtility();
-    // setCentralWidget(f);
-
-    FormDomainUtilities *f = new FormDomainUtilities();
-    setCentralWidget(f);
-
+    DisplayAlternateDataStreamEditor();
+    connect(ui->actionLockFileUtility, SIGNAL(triggered()), this, SLOT(DisplayLockFileUtility()));
+    connect(ui->actionADSEditor, SIGNAL(triggered()), this, SLOT(DisplayAlternateDataStreamEditor()));
+    connect(ui->actionCheckDomainUtility, SIGNAL(triggered()), this, SLOT(DisplayCheckDomainUtility()));
 }
 
 MainWindow::~MainWindow()
@@ -26,3 +20,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::DisplayAlternateDataStreamEditor()
+{
+    setCentralWidget(new FormStreamEditor());
+}
+
+void MainWindow::DisplayLockFileUtility()
+{
+    setCentralWidget(new FormFileUtility());
+}
+
+void MainWindow::DisplayCheckDomainUtility()
+{
+    setCentralWidget(new FormDomainUtilities());
+}
