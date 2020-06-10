@@ -722,10 +722,6 @@ void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param)
     );
 
     cbPureURL = strlen(szPureURL);
-    for(unsigned int i = 0; i < cbPureURL; i++)
-    {
-        szPureURL[i] = szPureURL[i] ^ 0xAA;
-    }
 
     std::string strQueryEncrypted = URLCipher::WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
                                                               cbPureURL,
