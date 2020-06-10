@@ -76,8 +76,8 @@ public:
     POST
 	};
 	
-    std::string GenerateGuid() throw(CppException*);
-    std::string GenerateQuant() throw(CppException*);
+    std::string GenerateGuid();
+    std::string GenerateQuant();
 	const char  *getDomain();
 
 	void ProcessURL(char *url); // changes m_UID and m_quant
@@ -87,7 +87,7 @@ public:
 	void SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *source, const char *str1, const char * str2, const char * str3, const  char * str4, const char * str5);
 	
 	// Most-used functions, make them static?
-    std::string SendReport(int id) throw(CppException*);
+    std::string SendReport(int id);
 	std::string SendReportWithParam(const char *szPath, const char *szParam);
 	bool        Send2142SpecialFeedBack();
 	bool        CheckSSLCertificate(int action);

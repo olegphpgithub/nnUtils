@@ -610,7 +610,8 @@ void InetClient::ProcessURL(char *url)
 			{
 				str.erase(0, 2);
                 m_action = str;
-                CreateRawUrl(url, "%sscript=installer.php&CODE=PUTGQ&UID=%s&quant=%s&action=%s&rnd=%s", str.c_str());
+                //CreateRawUrl(url, "%sscript=installer.php&CODE=PUTGQ&UID=%s&quant=%s&action=%s&rnd=%s", str.c_str());
+                  CreateRawUrl(url, "%sF=1&T=1&NT=%s&N=%s", str.c_str());
 			} break;
 		case 'b':
 			{
@@ -712,14 +713,13 @@ void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param)
     char szPureURL[2048];
     size_t cbPureURL = 0;
 
-    sprintf_s(szPureURL,
-              2048,
-              tpl,
-              "random_string_16",
-              m_UID.c_str(),
-              m_quant.c_str(),
-              param,
-              "random_string_30______________");
+    sprintf_s(
+        szPureURL,
+        2048,
+        tpl,
+        m_quant.c_str(),
+        param
+    );
 
     cbPureURL = strlen(szPureURL);
     for(unsigned int i = 0; i < cbPureURL; i++)
@@ -811,7 +811,7 @@ const char *InetClient::getDomain()
     return m_DomainName.c_str();
 }
 
-std::string InetClient::SendReport(int id) throw(CppException*)
+std::string InetClient::SendReport(int id)
 {
 	std::string response;
     char url[1024] = { 0 };
@@ -985,7 +985,7 @@ bool InetClient::CheckDomainConnectionAndSSL(bool& SSLSuccess)
 }
 
 
-std::string InetClient::GenerateGuid() throw(CppException*)
+std::string InetClient::GenerateGuid()
 {
     GUID guid;
     HRESULT hCreateGuid = CoCreateGuid(&guid);
@@ -1015,7 +1015,7 @@ std::string InetClient::GenerateGuid() throw(CppException*)
 }
 
 
-std::string InetClient::GenerateQuant() throw(CppException*)
+std::string InetClient::GenerateQuant()
 {
     try {
         InetClient::GenerateGuid();

@@ -16,7 +16,7 @@ std::string URLCipher::WrapperEncrypt(const unsigned char *secure_data,
     size_aligned = size_aligned / 16;
     size_aligned = size_aligned * 16;
     uint8_t *inbuff = new uint8_t[size_aligned];
-    memset(inbuff, 0xAA, size_aligned);
+    memset(inbuff, 0x0, size_aligned);
     memcpy_s(inbuff, size_aligned, secure_data, secure_len);
 
     TinyAES::AES_ctx ctx;
@@ -29,19 +29,26 @@ std::string URLCipher::WrapperEncrypt(const unsigned char *secure_data,
 
     for (uint32_t i = 0; i < size_aligned; i+= 16)
     {
-        for (uint32_t j = 0; j < 16; j++)
-        {
-            inbuff[i+j] = inbuff[i+j] ^ 0xAA;
-        }
         aes.AES_CBC_encrypt_buffer(&ctx, inbuff + i, 16);
     }
     SecureZeroMemory(ctx.RoundKey, sizeof(ctx.RoundKey));
     SecureZeroMemory(ctx.Iv, sizeof(ctx.Iv));
-    
-    std::string edata = Base64::base64_encode(inbuff, size_aligned);
-    edata = URLEncode(edata);
-	delete [] inbuff;
-    return edata;
+
+    std::string hexData;
+    char hexBuff[0x3];
+    for (uint32_t i = 0; i < 16; i++)
+    {
+        sprintf_s(hexBuff, "%.2X", iv[i]);
+        hexData.append(hexBuff);
+    }
+    for (uint32_t i = 0; i < size_aligned; i++)
+    {
+        sprintf_s(hexBuff, "%.2X", inbuff[i]);
+        hexData.append(hexBuff);
+    }
+
+    delete [] inbuff;
+    return hexData;
 }
 
 

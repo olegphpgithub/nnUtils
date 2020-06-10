@@ -26,7 +26,7 @@
      <item>
       <widget class="QLineEdit" name="domainNameLineEdit">
        <property name="text">
-        <string>downloadsoftcenter.com</string>
+        <string>onegoldensoftware.com</string>
        </property>
       </widget>
      </item>
@@ -40,7 +40,7 @@
      <item>
       <widget class="QLineEdit" name="domainKeyLineEdit">
        <property name="text">
-        <string>CA1F5D1C32B5B621EE824AE5328DA</string>
+        <string>E070D365ACEBFF0BEF8C6E03880F6</string>
        </property>
       </widget>
      </item>
