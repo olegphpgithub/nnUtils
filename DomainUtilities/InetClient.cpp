@@ -27,6 +27,7 @@ InetClient::InetClient(void)
 	
     m_szSSLCert[IC_SSL_CERT_BUF_SIZE - 1] = '\0';
     m_sUserAgent.assign("NSIS_Inetc (Mozilla)");
+    m_quant = "0";
 
 }
 
@@ -611,7 +612,7 @@ void InetClient::ProcessURL(char *url)
 				str.erase(0, 2);
                 m_action = str;
                 //CreateRawUrl(url, "%sscript=installer.php&CODE=PUTGQ&UID=%s&quant=%s&action=%s&rnd=%s", str.c_str());
-                  CreateRawUrl(url, "%sF=1&T=1&NT=%s&N=%s", str.c_str());
+                  CreateRawUrl(url, "F=1&T=1&NT=%s&N=%s", str.c_str());
 			} break;
 		case 'b':
 			{
@@ -1019,7 +1020,7 @@ std::string InetClient::GenerateQuant()
         __int64 iQuant = 1234567890;
         char buff[0x100];
 
-        std::string squant = SendReport(1u);
+        std::string squant = SendReport(1 + m_DomainOffset);
 
         if (squant.empty())
         {

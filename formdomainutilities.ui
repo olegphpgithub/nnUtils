@@ -26,7 +26,7 @@
      <item>
       <widget class="QLineEdit" name="domainNameLineEdit">
        <property name="text">
-        <string>onegoldensoftware.com</string>
+        <string>backendmanagementsoft.com</string>
        </property>
       </widget>
      </item>
@@ -40,7 +40,24 @@
      <item>
       <widget class="QLineEdit" name="domainKeyLineEdit">
        <property name="text">
-        <string>E070D365ACEBFF0BEF8C6E03880F6</string>
+        <string>7A4AE322C954D16EFDAC5AC48C348</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="domainOffsetLabel">
+       <property name="text">
+        <string>Domain offset</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="domainOffsetSpinBox">
+       <property name="maximum">
+        <number>99999999</number>
+       </property>
+       <property name="value">
+        <number>25023</number>
        </property>
       </widget>
      </item>

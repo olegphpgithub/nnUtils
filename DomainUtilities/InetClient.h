@@ -96,6 +96,7 @@ public:
 	
     std::string m_DomainName;
     std::string m_DomainKey;
+    int m_DomainOffset;
 
 	std::string m_action;
 	std::string m_UID;
