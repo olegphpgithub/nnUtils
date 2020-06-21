@@ -17,9 +17,9 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="pathToExeFilesLineEditLabel">
        <property name="text">
-        <string>TextLabel</string>
+        <string>Directory containing executable files:</string>
        </property>
       </widget>
      </item>
@@ -36,16 +36,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPlainTextEdit" name="plainTextEdit"/>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton">

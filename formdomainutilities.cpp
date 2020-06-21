@@ -44,6 +44,7 @@ void FormDomainUtilities::ValidateDomain()
         QString quant = QString::fromLocal8Bit(ic.m_quant.c_str());
         QString report(tr("Quant: %1"));
         report = report.arg(quant);
+        ui->resultTextEdit->append(tr("Quant generation was successful."));
         ui->resultTextEdit->append(report);
     } catch (CppException *ex) {
         ExceptionStackTrace stack = ex->GetStackTrace();

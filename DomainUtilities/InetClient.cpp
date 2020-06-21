@@ -609,10 +609,9 @@ void InetClient::ProcessURL(char *url)
 		case 'a':
 			if (str.find("a:") == 0)
 			{
-				str.erase(0, 2);
+                str.erase(0, 2);
                 m_action = str;
-                //CreateRawUrl(url, "%sscript=installer.php&CODE=PUTGQ&UID=%s&quant=%s&action=%s&rnd=%s", str.c_str());
-                  CreateRawUrl(url, "F=1&T=1&NT=%s&N=%s", str.c_str());
+                CreateRawUrl(url, "F=1&T=1&NT=%s&N=%s", str.c_str());
 			} break;
 		case 'b':
 			{
@@ -1022,6 +1021,9 @@ std::string InetClient::GenerateQuant()
 
         std::string squant = SendReport(1 + m_DomainOffset);
 
+        squant.erase(0, squant.find_first_not_of("\t\n\v\f\r "));
+        squant.erase(squant.find_last_not_of("\t\n\v\f\r ") + 1);
+
         if (squant.empty())
         {
             throw new CppException(TEXT("Request with action '1' returned empty string"), 1);
@@ -1034,17 +1036,32 @@ std::string InetClient::GenerateQuant()
 
         iQuant =_atoi64(squant.c_str());
         __int64 dig2 = iQuant %100;
-        if (dig2 < 26) { iQuant = iQuant + 8923 - dig2 *3;}
-        else {
-            if (dig2 < 51) { iQuant = iQuant + dig2 *4;}
-            else {
-                if (dig2 < 76) { iQuant = iQuant + dig2*3 - 5;}
-                else { iQuant = iQuant - dig2 + 10000;}
+        if (dig2 < 26)
+        {
+            iQuant = iQuant + 8923 - dig2 * 3;
+        }
+        else
+        {
+            if (dig2 < 51)
+            {
+                iQuant = iQuant + dig2 * 4;
+            }
+            else
+            {
+                if (dig2 < 76)
+                {
+                    iQuant = iQuant + dig2 * 3 - 5;
+                }
+                else
+                {
+                    iQuant = iQuant - dig2 + 10000;
+                }
             }
         }
 
         sprintf_s(buff, 0x100, "%lld", iQuant);
         return std::string(buff);
+
     } catch(CppException *ex) {
         throw new CppException(TEXT("GenerateQuant failed"), ex->m_dwErrno, ex);
     }
