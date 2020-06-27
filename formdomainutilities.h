@@ -21,6 +21,7 @@ public:
 public slots:
     void ValidateDomain();
     void onFinished(QNetworkReply *reply);
+    void onActivated(const QModelIndex &index);
 
 private:
     Ui::FormDomainUtilities *ui;

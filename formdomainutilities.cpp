@@ -2,6 +2,7 @@
 #include "ui_formdomainutilities.h"
 
 #include "CppException.h"
+#include "treemodel.h"
 #include "DomainUtilities/InetClient.h"
 
 
@@ -24,6 +25,11 @@ FormDomainUtilities::FormDomainUtilities(QWidget *parent) :
             SIGNAL(finished( QNetworkReply*)),
             this,
             SLOT(onFinished(QNetworkReply*)));
+
+    connect(ui->resultTreeView,
+            SIGNAL(activated(const QModelIndex&)),
+            this,
+            SLOT(onActivated(const QModelIndex&)));
 }
 
 FormDomainUtilities::~FormDomainUtilities()
@@ -33,6 +39,13 @@ FormDomainUtilities::~FormDomainUtilities()
 
 void FormDomainUtilities::ValidateDomain()
 {
+
+    QFile file(":/default.txt");
+    file.open(QIODevice::ReadOnly);
+    TreeModel *model = new TreeModel(file.readAll());
+    ui->resultTreeView->setModel(model);
+    file.close();
+
     ui->resultTextEdit->append(tr("Please wait..."));
 
     try {
@@ -72,4 +85,10 @@ void FormDomainUtilities::onFinished(QNetworkReply *reply)
         ui->resultTextEdit->append(reply->errorString());
     }
     reply->deleteLater();
+}
+
+void FormDomainUtilities::onActivated(const QModelIndex &index)
+{
+    QModelIndex desiredIndex(index.model()->index(index.row(), 1, index.parent()));
+    ui->resultTextEdit->setText(desiredIndex.data().toString());
 }

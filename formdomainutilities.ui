@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>332</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,7 +69,17 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="resultTextEdit"/>
+      <widget class="QTreeView" name="resultTreeView"/>
+     </item>
+     <item>
+      <widget class="QTextEdit" name="resultTextEdit">
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

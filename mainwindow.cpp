@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    DisplayAlternateDataStreamEditor();
+    DisplayCheckDomainUtility();
     connect(ui->actionLockFileUtility, SIGNAL(triggered()), this, SLOT(DisplayLockFileUtility()));
     connect(ui->actionADSEditor, SIGNAL(triggered()), this, SLOT(DisplayAlternateDataStreamEditor()));
     connect(ui->actionCheckDomainUtility, SIGNAL(triggered()), this, SLOT(DisplayCheckDomainUtility()));

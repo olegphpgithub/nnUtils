@@ -26,7 +26,9 @@ SOURCES += \
     formfileutility.cpp \
     formstreameditor.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    treeitem.cpp \
+    treemodel.cpp
 
 HEADERS += \
     CppException.h \
@@ -38,13 +40,17 @@ HEADERS += \
     formdomainutilities.h \
     formfileutility.h \
     formstreameditor.h \
-    mainwindow.h
+    mainwindow.h \
+    treeitem.h \
+    treemodel.h
 
 FORMS += \
     formdomainutilities.ui \
     formfileutility.ui \
     formstreameditor.ui \
     mainwindow.ui
+
+RESOURCES   = simpletreemodel.qrc
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
