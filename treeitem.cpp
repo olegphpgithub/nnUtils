@@ -73,6 +73,7 @@ TreeItem::~TreeItem()
 void TreeItem::appendChild(TreeItem *item)
 {
     m_childItems.append(item);
+    item->m_parentItem = this;
 }
 //! [2]
 

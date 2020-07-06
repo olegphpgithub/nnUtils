@@ -4,7 +4,7 @@
 #include "CppException.h"
 #include "treemodel.h"
 #include "DomainUtilities/InetClient.h"
-
+#include "DomainUtilities/DomainInspector.h"
 
 #include <QtWidgets>
 #include <QNetworkAccessManager>
@@ -72,6 +72,13 @@ void FormDomainUtilities::ValidateDomain()
         }
     }
 
+
+    DomainInspector *domainInspector = new DomainInspector();
+
+    // QObject::connect(domainInspector, SIGNAL(progress(QModelIndex)), this, SLOT(progress(QModelIndex)));
+    // QObject::connect(domainInspector, SIGNAL(finished()), this, SLOT(run()));
+
+    domainInspector->start();
 }
 
 void FormDomainUtilities::onFinished(QNetworkReply *reply)
