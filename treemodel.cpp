@@ -59,6 +59,13 @@
 #include "treeitem.h"
 
 #include <QStringList>
+#include <QtDebug>
+
+TreeModel::TreeModel(QObject *parent)
+    : QAbstractItemModel(parent)
+{
+    rootItem = new TreeItem({tr("Title"), tr("Summary")});
+}
 
 //! [0]
 TreeModel::TreeModel(const QString &data, QObject *parent)

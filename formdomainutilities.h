@@ -9,6 +9,8 @@ class FormDomainUtilities;
 }
 
 class QNetworkReply;
+class TreeModel;
+class TreeItem;
 
 class FormDomainUtilities : public QWidget
 {
@@ -17,11 +19,13 @@ class FormDomainUtilities : public QWidget
 public:
     explicit FormDomainUtilities(QWidget *parent = nullptr);
     ~FormDomainUtilities();
+    TreeModel *treeModel;
 
 public slots:
     void ValidateDomain();
     void onFinished(QNetworkReply *reply);
     void onActivated(const QModelIndex &index);
+    void progress(TreeItem *index);
 
 private:
     Ui::FormDomainUtilities *ui;

@@ -63,6 +63,7 @@ class TreeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    explicit TreeModel(QObject *parent = nullptr);
     explicit TreeModel(const QString &data, QObject *parent = nullptr);
     ~TreeModel();
 
@@ -75,11 +76,10 @@ public:
     QModelIndex parent(const QModelIndex &index) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    TreeItem *rootItem;
 
 private:
     void setupModelData(const QStringList &lines, TreeItem *parent);
-
-    TreeItem *rootItem;
 };
 //! [0]
 

@@ -38,7 +38,7 @@ InetClient::~InetClient(void)
 
 bool InetClient::Connect(const std::string &host,
                          int port = INTERNET_DEFAULT_HTTP_PORT,
-                         DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG) throw(CppException*)
+                         DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG)
 {
 	m_bConnected = true;
 	

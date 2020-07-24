@@ -120,7 +120,7 @@ public:
 	void EraseDownloadedFile();
 
 	// Wrapper functions for SendRequest, uses defined number of IC_MAX_TRIES:
-    bool SendGetRequest(const std::string &url, std::string &response) throw(CppException*);
+    bool SendGetRequest(const std::string &url, std::string &response);
 	// Uses stored SSL cert for request and then updates caller's strCertificate: 
 	bool SendGetRequestWithSSLCert(const std::string &url, std::string &response, std::string &strCertificate);
 	bool SendPostRequest(const std::string &url, const std::string &postData, std::string &response);
@@ -135,7 +135,7 @@ public:
     char			m_szSSLCert[IC_SSL_CERT_BUF_SIZE];
 
     bool			Connect(const std::string &host,
-                            int port, DWORD dwAccessType) throw(CppException*);
+                            int port, DWORD dwAccessType);
 	bool			Disconnect();
 	
 	// Splits URL into scheme, host, port and query:
@@ -153,7 +153,7 @@ public:
                      std::string &response,
                      const RequestMethod requestMethod = RequestMethod::GET,
                      const std::string &postData = "",
-                     bool bGetSSLCert = false) throw(CppException*);
+                     bool bGetSSLCert = false);
 
 private:
 	void gen_random(char *s, const int len);

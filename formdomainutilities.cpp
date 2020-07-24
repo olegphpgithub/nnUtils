@@ -3,12 +3,14 @@
 
 #include "CppException.h"
 #include "treemodel.h"
+#include "treeitem.h"
 #include "DomainUtilities/InetClient.h"
 #include "DomainUtilities/DomainInspector.h"
 
 #include <QtWidgets>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QDebug>
 
 FormDomainUtilities::FormDomainUtilities(QWidget *parent) :
     QWidget(parent),
@@ -39,46 +41,24 @@ FormDomainUtilities::~FormDomainUtilities()
 
 void FormDomainUtilities::ValidateDomain()
 {
-
-    QFile file(":/default.txt");
-    file.open(QIODevice::ReadOnly);
-    TreeModel *model = new TreeModel(file.readAll());
-    ui->resultTreeView->setModel(model);
-    file.close();
-
-    ui->resultTextEdit->append(tr("Please wait..."));
-
-    try {
-        InetClient ic;
-        ic.m_DomainName.assign(ui->domainNameLineEdit->text().toLocal8Bit());
-        ic.m_DomainKey.assign(ui->domainKeyLineEdit->text().toLocal8Bit());
-        ic.m_DomainOffset = ui->domainOffsetSpinBox->value();
-        ic.m_quant = ic.GenerateQuant();
-        QString quant = QString::fromLocal8Bit(ic.m_quant.c_str());
-        QString report(tr("Quant: %1"));
-        report = report.arg(quant);
-        ui->resultTextEdit->append(tr("Quant generation was successful."));
-        ui->resultTextEdit->append(report);
-    } catch (CppException *ex) {
-        ExceptionStackTrace stack = ex->GetStackTrace();
-        for (ExceptionStackTrace::iterator it = stack.begin();
-             it < stack.end(); it++)
-        {
-#           ifdef UNICODE
-                ui->resultTextEdit->append(QString::fromWCharArray(it->c_str()));
-#           else
-                ui->resultTextEdit->append(QString::fromLatin1(it->c_str()));
-#           endif
-        }
-    }
-
-
+    treeModel = new TreeModel();
     DomainInspector *domainInspector = new DomainInspector();
-
-    // QObject::connect(domainInspector, SIGNAL(progress(QModelIndex)), this, SLOT(progress(QModelIndex)));
-    // QObject::connect(domainInspector, SIGNAL(finished()), this, SLOT(run()));
-
+    domainInspector->m_DomainName = ui->domainNameLineEdit->text();
+    domainInspector->m_DomainKey = ui->domainKeyLineEdit->text();
+    domainInspector->m_DomainOffset = ui->domainOffsetSpinBox->value();
+    QObject::connect(domainInspector, SIGNAL(progress(TreeItem*)), this, SLOT(progress(TreeItem*)));
+    QObject::connect(domainInspector, SIGNAL(finished()), domainInspector, SLOT(deleteLater()));
     domainInspector->start();
+}
+
+void FormDomainUtilities::progress(TreeItem *index)
+{
+    if(index != nullptr)
+    {
+        treeModel->rootItem->appendChild(index);
+        ui->resultTreeView->setModel(nullptr);
+        ui->resultTreeView->setModel(treeModel);
+    }
 }
 
 void FormDomainUtilities::onFinished(QNetworkReply *reply)
