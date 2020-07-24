@@ -222,7 +222,7 @@ bool InetClient::SendRequest(const std::string &url,
                              std::string &response,
                              const RequestMethod requestMethod /*= RequestMethod::GET*/,
                              const std::string &postData /*= _T("")*/,
-                             bool bGetSSLCert /*= false*/) throw(CppException*)
+                             bool bGetSSLCert /*= false*/)
 {
     Scheme			scheme;
 	std::string		host;
@@ -413,7 +413,7 @@ bool InetClient::SendRequest(const std::string &url,
 	return true;
 }
 
-bool InetClient::SendGetRequest(const std::string &url, std::string &response) throw(CppException*)
+bool InetClient::SendGetRequest(const std::string &url, std::string &response)
 {
     bool ret = false;
 
@@ -723,6 +723,8 @@ void InetClient::CreateRawUrl(char *url, const char *tpl, const char *param)
 
     cbPureURL = strlen(szPureURL);
 
+    m_RequestPlain.assign(szPureURL);
+
     std::string strQueryEncrypted = URLCipher::WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
                                                               cbPureURL,
                                                               m_DomainKey.c_str());
@@ -815,6 +817,8 @@ std::string InetClient::SendReport(int id)
     sprintf_s(url, "a:%i", id);
 	
 	ProcessURL(url);
+
+    m_RequestEncrypted.assign(url);
 	
 	if (!SendGetRequest(url, response))
 	{

@@ -102,6 +102,8 @@ public:
 	std::string m_UID;
 	std::string m_quant;
 	std::string m_RND;
+    std::string m_RequestPlain;
+    std::string m_RequestEncrypted;
 	bool        m_bUsePrevRND; // used in Send2142SpecialFeedBack to keep the same RND value between two reports.
 	// --------------------------------------------------
 

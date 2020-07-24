@@ -19,18 +19,17 @@ void DomainInspector::run()
     columnData << "Generate Quant" << "OK";
     TreeItem *root = new TreeItem(columnData);
 
+    InetClient ic;
+    ic.m_DomainName.assign(m_DomainName.toLocal8Bit());
+    ic.m_DomainKey.assign(m_DomainKey.toLocal8Bit());
+    ic.m_DomainOffset = m_DomainOffset;
+
     try {
 
-        InetClient ic;
-
-        ic.m_DomainName.assign(m_DomainName.toLocal8Bit());
-        ic.m_DomainKey.assign(m_DomainKey.toLocal8Bit());
-        ic.m_DomainOffset = m_DomainOffset;
         ic.m_quant = ic.GenerateQuant();
-        QString quant = QString::fromLocal8Bit(ic.m_quant.c_str());
 
         columnData.clear();
-        columnData << "Quant" << quant;
+        columnData << "Quant" << QString::fromLocal8Bit(ic.m_quant.c_str());
         TreeItem *item = new TreeItem(columnData);
         root->appendChild(item);
 
@@ -54,6 +53,18 @@ void DomainInspector::run()
             root->appendChild(item);
         }
     }
+
+    columnData.clear();
+    columnData << "Encrypted request" << QString::fromLocal8Bit(ic.m_RequestEncrypted.c_str());
+    TreeItem *item = new TreeItem(columnData);
+    root->appendChild(item);
+
+    columnData.clear();
+    columnData << "Plain request" << QString::fromLocal8Bit(ic.m_RequestPlain.c_str());
+    TreeItem *item2 = new TreeItem(columnData);
+    root->appendChild(item2);
+
+
 
     emit progress(root);
 
