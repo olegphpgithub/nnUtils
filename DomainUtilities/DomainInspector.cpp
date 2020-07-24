@@ -30,8 +30,7 @@ void DomainInspector::run()
 
         columnData.clear();
         columnData << "Quant" << QString::fromLocal8Bit(ic.m_quant.c_str());
-        TreeItem *item = new TreeItem(columnData);
-        root->appendChild(item);
+        root->appendChild(new TreeItem(columnData));
 
     } catch (CppException *ex) {
 
@@ -49,22 +48,17 @@ void DomainInspector::run()
 
             columnData.clear();
             columnData << "Error" << errorString;
-            TreeItem *item = new TreeItem(columnData);
-            root->appendChild(item);
+            root->appendChild(new TreeItem(columnData));
         }
     }
 
     columnData.clear();
     columnData << "Encrypted request" << QString::fromLocal8Bit(ic.m_RequestEncrypted.c_str());
-    TreeItem *item = new TreeItem(columnData);
-    root->appendChild(item);
+    root->appendChild(new TreeItem(columnData));
 
     columnData.clear();
     columnData << "Plain request" << QString::fromLocal8Bit(ic.m_RequestPlain.c_str());
-    TreeItem *item2 = new TreeItem(columnData);
-    root->appendChild(item2);
-
-
+    root->appendChild(new TreeItem(columnData));
 
     emit progress(root);
 
