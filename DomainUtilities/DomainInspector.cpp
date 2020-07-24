@@ -26,28 +26,19 @@ void DomainInspector::run()
         ic.m_quant = ic.GenerateQuant();
         QString quant = QString::fromLocal8Bit(ic.m_quant.c_str());
 
-        columnData << m_DomainName << "OK";
-        root = new TreeItem(columnData);
-
         columnData.clear();
         columnData << "Generate Quant" << "OK";
-        TreeItem *item = new TreeItem(columnData);
-        root->appendChild(item);
+        root = new TreeItem(columnData);
 
         columnData.clear();
         columnData << "Quant" << quant;
-        TreeItem *subItem = new TreeItem(columnData);
-        item->appendChild(subItem);
+        TreeItem *item = new TreeItem(columnData);
+        root->appendChild(item);
 
     } catch (CppException *ex) {
 
-        columnData << m_DomainName << "FAILURE";
-        root = new TreeItem(columnData);
-
-        columnData.clear();
         columnData << "Generate Quant" << "FAILURE";
-        TreeItem *item = new TreeItem(columnData);
-        root->appendChild(item);
+        root = new TreeItem(columnData);
 
         ExceptionStackTrace stack = ex->GetStackTrace();
         for (ExceptionStackTrace::iterator it = stack.begin();
@@ -61,10 +52,11 @@ void DomainInspector::run()
 
             columnData.clear();
             columnData << "Error" << errorString;
-            TreeItem *subItem = new TreeItem(columnData);
-            item->appendChild(subItem);
+            TreeItem *item = new TreeItem(columnData);
+            root->appendChild(item);
         }
     }
 
     emit progress(root);
+
 }
