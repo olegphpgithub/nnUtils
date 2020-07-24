@@ -14,7 +14,10 @@ void DomainInspector::run()
 {
 
     QVector<QVariant> columnData;
-    TreeItem *root;
+
+    columnData.clear();
+    columnData << "Generate Quant" << "OK";
+    TreeItem *root = new TreeItem(columnData);
 
     try {
 
@@ -27,18 +30,13 @@ void DomainInspector::run()
         QString quant = QString::fromLocal8Bit(ic.m_quant.c_str());
 
         columnData.clear();
-        columnData << "Generate Quant" << "OK";
-        root = new TreeItem(columnData);
-
-        columnData.clear();
         columnData << "Quant" << quant;
         TreeItem *item = new TreeItem(columnData);
         root->appendChild(item);
 
     } catch (CppException *ex) {
 
-        columnData << "Generate Quant" << "FAILURE";
-        root = new TreeItem(columnData);
+        root->setData(1, "FAILURE");
 
         ExceptionStackTrace stack = ex->GetStackTrace();
         for (ExceptionStackTrace::iterator it = stack.begin();
