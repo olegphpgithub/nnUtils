@@ -60,6 +60,10 @@ void DomainInspector::run()
     columnData << "Plain request" << QString::fromLocal8Bit(ic.m_RequestPlain.c_str());
     root->appendChild(new TreeItem(columnData));
 
+    columnData.clear();
+    columnData << "Response" << QString::fromLocal8Bit(ic.m_Response.c_str());
+    root->appendChild(new TreeItem(columnData));
+
     emit progress(root);
 
 }

@@ -71,11 +71,11 @@ public:
     HTTPS
 	};
 	enum RequestMethod
-	{
-    GET = 0,
-    POST
-	};
-	
+    {
+        GET = 0,
+        POST
+    };
+
     std::string GenerateGuid();
     std::string GenerateQuant();
 	const char  *getDomain();
@@ -104,6 +104,7 @@ public:
 	std::string m_RND;
     std::string m_RequestPlain;
     std::string m_RequestEncrypted;
+    std::string m_Response;
 	bool        m_bUsePrevRND; // used in Send2142SpecialFeedBack to keep the same RND value between two reports.
 	// --------------------------------------------------
 

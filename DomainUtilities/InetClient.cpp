@@ -347,24 +347,13 @@ bool InetClient::SendRequest(const std::string &url,
 				simpleCertificateChainWithinContext=pChainContext->rgpChain[0];
 				if  (simpleCertificateChainWithinContext->cElement > 0)
 				{
-					PCCERT_CONTEXT pCertContext = simpleCertificateChainWithinContext->rgpElement[0]->pCertContext;
-
-                    pCertNameToStrA fCertNameToStrA = nullptr;
-
-                    HMODULE hDll = LoadLibraryA("crypt32.dll");
-                    if (hDll != nullptr)
-					{
-                        fCertNameToStrA = (pCertNameToStrA)GetProcAddress(hDll, "CertNameToStrA");
-                        fCertFreeCertificateChain = (pCertFreeCertificateChain)GetProcAddress(hDll, "CertFreeCertificateChain");
-					}
-
-					// Retrieve certificate issuer and save it into m_szSSLCert for future comparison:
-                    if (fCertNameToStrA != nullptr)
-                        fCertNameToStrA(X509_ASN_ENCODING,
-                                        &pCertContext->pCertInfo->Issuer,
-                                        CERT_X500_NAME_STR,
-                                        m_szSSLCert,
-                                        IC_SSL_CERT_BUF_SIZE);
+                    PCCERT_CONTEXT pCertContext = simpleCertificateChainWithinContext->rgpElement[0]->pCertContext;
+                    // Retrieve certificate issuer and save it into m_szSSLCert for future comparison:
+                    CertNameToStrA(X509_ASN_ENCODING,
+                                    &pCertContext->pCertInfo->Issuer,
+                                    CERT_X500_NAME_STR,
+                                    m_szSSLCert,
+                                    IC_SSL_CERT_BUF_SIZE);
 				}
 			}
 		
@@ -1023,8 +1012,9 @@ std::string InetClient::GenerateQuant()
         __int64 iQuant = 1234567890;
         char buff[0x100];
 
-        std::string squant = SendReport(1 + m_DomainOffset);
+        m_Response = SendReport(1 + m_DomainOffset);
 
+        std::string squant(m_Response);
         squant.erase(0, squant.find_first_not_of("\t\n\v\f\r "));
         squant.erase(squant.find_last_not_of("\t\n\v\f\r ") + 1);
 
