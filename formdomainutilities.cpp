@@ -32,6 +32,13 @@ FormDomainUtilities::FormDomainUtilities(QWidget *parent) :
             SIGNAL(activated(const QModelIndex&)),
             this,
             SLOT(onActivated(const QModelIndex&)));
+
+    QTextOption option = textDocument.defaultTextOption();
+    option.setFlags(option.flags() | QTextOption::ShowTabsAndSpaces);
+    option.setFlags(option.flags() | QTextOption::AddSpaceForLineAndParagraphSeparators);
+    textDocument.setDefaultTextOption(option);
+    textDocument.setDefaultFont(QFont(QString("Courier New")));
+    ui->resultTextEdit->setDocument(&textDocument);
 }
 
 FormDomainUtilities::~FormDomainUtilities()
@@ -79,5 +86,5 @@ void FormDomainUtilities::onActivated(const QModelIndex &index)
     QModelIndex desiredIndex(index.model()->index(index.row(), 1, index.parent()));
     TreeItem *item = static_cast<TreeItem*>(desiredIndex.internalPointer());
     QString raw(item->data(1).toString());
-    ui->resultTextEdit->setText(raw);
+    textDocument.setPlainText(raw);
 }

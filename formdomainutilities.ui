@@ -69,7 +69,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="resultTreeView"/>
+      <widget class="QTreeView" name="resultTreeView">
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QTextEdit" name="resultTextEdit">

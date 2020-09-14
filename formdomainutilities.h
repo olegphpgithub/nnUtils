@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QNetworkAccessManager>
+#include <QTextDocument>
 
 namespace Ui {
 class FormDomainUtilities;
@@ -20,6 +21,7 @@ public:
     explicit FormDomainUtilities(QWidget *parent = nullptr);
     ~FormDomainUtilities();
     TreeModel *treeModel;
+    QTextDocument textDocument;
 
 public slots:
     void ValidateDomain();
