@@ -96,7 +96,9 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
 
     TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
 
-    return item->data(index.column());
+    QString raw(item->data(index.column()).toString());
+    QString trim = raw.replace(QString("\r\n"), " ");
+    return trim;
 }
 
 Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const

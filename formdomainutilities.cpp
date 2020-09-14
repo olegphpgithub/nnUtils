@@ -77,5 +77,7 @@ void FormDomainUtilities::onFinished(QNetworkReply *reply)
 void FormDomainUtilities::onActivated(const QModelIndex &index)
 {
     QModelIndex desiredIndex(index.model()->index(index.row(), 1, index.parent()));
-    ui->resultTextEdit->setText(desiredIndex.data().toString());
+    TreeItem *item = static_cast<TreeItem*>(desiredIndex.internalPointer());
+    QString raw(item->data(1).toString());
+    ui->resultTextEdit->setText(raw);
 }
