@@ -35,7 +35,7 @@ FormDomainUtilities::FormDomainUtilities(QWidget *parent) :
 
     QTextOption option = textDocument.defaultTextOption();
     option.setFlags(option.flags() | QTextOption::ShowTabsAndSpaces);
-    option.setFlags(option.flags() | QTextOption::AddSpaceForLineAndParagraphSeparators);
+    option.setFlags(option.flags() | QTextOption::ShowLineAndParagraphSeparators);
     textDocument.setDefaultTextOption(option);
     textDocument.setDefaultFont(QFont(QString("Courier New")));
     ui->resultTextEdit->setDocument(&textDocument);
