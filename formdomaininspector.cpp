@@ -1,5 +1,5 @@
-#include "formdomainutilities.h"
-#include "ui_formdomainutilities.h"
+#include "formdomaininspector.h"
+#include "ui_formdomaininspector.h"
 
 #include "CppException.h"
 #include "treemodel.h"
@@ -12,9 +12,9 @@
 #include <QNetworkReply>
 #include <QDebug>
 
-FormDomainUtilities::FormDomainUtilities(QWidget *parent) :
+FormDomainInspector::FormDomainInspector(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::FormDomainUtilities)
+    ui(new Ui::FormDomainInspector)
 {
     ui->setupUi(this);
 
@@ -41,12 +41,12 @@ FormDomainUtilities::FormDomainUtilities(QWidget *parent) :
     ui->resultTextEdit->setDocument(&textDocument);
 }
 
-FormDomainUtilities::~FormDomainUtilities()
+FormDomainInspector::~FormDomainInspector()
 {
     delete ui;
 }
 
-void FormDomainUtilities::ValidateDomain()
+void FormDomainInspector::ValidateDomain()
 {
     treeModel = new TreeModel();
     DomainInspector *domainInspector = new DomainInspector();
@@ -58,7 +58,7 @@ void FormDomainUtilities::ValidateDomain()
     domainInspector->start();
 }
 
-void FormDomainUtilities::progress(TreeItem *index)
+void FormDomainInspector::progress(TreeItem *index)
 {
     if(index != nullptr)
     {
@@ -68,7 +68,7 @@ void FormDomainUtilities::progress(TreeItem *index)
     }
 }
 
-void FormDomainUtilities::onFinished(QNetworkReply *reply)
+void FormDomainInspector::onFinished(QNetworkReply *reply)
 {
     if(reply->error() == QNetworkReply::NoError) {
         QString data = QString::fromUtf8( reply->readAll() );
@@ -81,7 +81,7 @@ void FormDomainUtilities::onFinished(QNetworkReply *reply)
     reply->deleteLater();
 }
 
-void FormDomainUtilities::onActivated(const QModelIndex &index)
+void FormDomainInspector::onActivated(const QModelIndex &index)
 {
     QModelIndex desiredIndex(index.model()->index(index.row(), 1, index.parent()));
     TreeItem *item = static_cast<TreeItem*>(desiredIndex.internalPointer());

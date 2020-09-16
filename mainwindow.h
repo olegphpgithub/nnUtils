@@ -10,7 +10,7 @@ QT_END_NAMESPACE
 class QStackedWidget;
 
 class FormFileUtility;
-class FormDomainUtilities;
+class FormDomainInspector;
 class FormStreamEditor;
 
 class MainWindow : public QMainWindow
@@ -24,7 +24,7 @@ public:
 public slots:
     void DisplayAlternateDataStreamEditor();
     void DisplayLockFileUtility();
-    void DisplayCheckDomainUtility();
+    void DisplayDomainInspector();
 
 private:
     Ui::MainWindow *ui;
@@ -33,6 +33,6 @@ private:
 
     FormFileUtility *formFileUtility;
     FormStreamEditor *formStreamEditor;
-    FormDomainUtilities *formDomainUtilities;
+    FormDomainInspector *formDomainInspector;
 };
 #endif // MAINWINDOW_H

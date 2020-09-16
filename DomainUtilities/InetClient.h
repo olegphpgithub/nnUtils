@@ -86,7 +86,7 @@ public:
 	// Used in Create* functions:
 	void SecureSprintf(DWORD *dst, DWORD *dwResultSize, const char *source, const char *str1, const char * str2, const char * str3, const  char * str4, const char * str5);
 	
-	// Most-used functions, make them static?
+    bool ObtainCertificate(LPCTSTR lpszDomainName);
     std::string SendReport(int id);
 	std::string SendReportWithParam(const char *szPath, const char *szParam);
 	bool        Send2142SpecialFeedBack();

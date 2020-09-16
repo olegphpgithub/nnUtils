@@ -1,25 +1,25 @@
-#ifndef FORMDOMAINUTILITIES_H
-#define FORMDOMAINUTILITIES_H
+#ifndef FORMDOMAININSPECTOR_H
+#define FORMDOMAININSPECTOR_H
 
 #include <QWidget>
 #include <QNetworkAccessManager>
 #include <QTextDocument>
 
 namespace Ui {
-class FormDomainUtilities;
+class FormDomainInspector;
 }
 
 class QNetworkReply;
 class TreeModel;
 class TreeItem;
 
-class FormDomainUtilities : public QWidget
+class FormDomainInspector : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit FormDomainUtilities(QWidget *parent = nullptr);
-    ~FormDomainUtilities();
+    explicit FormDomainInspector(QWidget *parent = nullptr);
+    ~FormDomainInspector();
     TreeModel *treeModel;
     QTextDocument textDocument;
 
@@ -30,8 +30,8 @@ public slots:
     void progress(TreeItem *index);
 
 private:
-    Ui::FormDomainUtilities *ui;
+    Ui::FormDomainInspector *ui;
     QNetworkAccessManager m_manager;
 };
 
-#endif // FORMDOMAINUTILITIES_H
+#endif // FORMDOMAININSPECTOR_H

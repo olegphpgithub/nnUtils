@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "formstreameditor.h"
 #include "formfileutility.h"
-#include "formdomainutilities.h"
+#include "formdomaininspector.h"
 
 #include <QStackedWidget>
 
@@ -14,19 +14,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionLockFileUtility, SIGNAL(triggered()), this, SLOT(DisplayLockFileUtility()));
     connect(ui->actionADSEditor, SIGNAL(triggered()), this, SLOT(DisplayAlternateDataStreamEditor()));
-    connect(ui->actionCheckDomainUtility, SIGNAL(triggered()), this, SLOT(DisplayCheckDomainUtility()));
+    connect(ui->actionCheckDomainUtility, SIGNAL(triggered()), this, SLOT(DisplayDomainInspector()));
 
     formFileUtility = new FormFileUtility();
-    formDomainUtilities = new FormDomainUtilities();
+    formDomainInspector = new FormDomainInspector();
     formStreamEditor = new FormStreamEditor();
 
     stackedWidget = new QStackedWidget();
     stackedWidget->addWidget(formFileUtility);
-    stackedWidget->addWidget(formDomainUtilities);
+    stackedWidget->addWidget(formDomainInspector);
     stackedWidget->addWidget(formStreamEditor);
     setCentralWidget(stackedWidget);
 
-    DisplayCheckDomainUtility();
+    DisplayDomainInspector();
 }
 
 MainWindow::~MainWindow()
@@ -44,7 +44,7 @@ void MainWindow::DisplayLockFileUtility()
     stackedWidget->setCurrentWidget(formFileUtility);
 }
 
-void MainWindow::DisplayCheckDomainUtility()
+void MainWindow::DisplayDomainInspector()
 {
-    stackedWidget->setCurrentWidget(formDomainUtilities);
+    stackedWidget->setCurrentWidget(formDomainInspector);
 }

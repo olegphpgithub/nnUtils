@@ -23,7 +23,7 @@ SOURCES += \
     DomainUtilities/TinyAES.cpp \
     DomainUtilities/URLCipher.cpp \
     fileutility.cpp \
-    formdomainutilities.cpp \
+    formdomaininspector.cpp \
     formfileutility.cpp \
     formstreameditor.cpp \
     main.cpp \
@@ -39,7 +39,7 @@ HEADERS += \
     DomainUtilities/TinyAES.h \
     DomainUtilities/URLCipher.h \
     fileutility.h \
-    formdomainutilities.h \
+    formdomaininspector.h \
     formfileutility.h \
     formstreameditor.h \
     mainwindow.h \
@@ -47,7 +47,7 @@ HEADERS += \
     treemodel.h
 
 FORMS += \
-    formdomainutilities.ui \
+    formdomaininspector.ui \
     formfileutility.ui \
     formstreameditor.ui \
     mainwindow.ui

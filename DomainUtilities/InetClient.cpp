@@ -218,6 +218,16 @@ std::string InetClient::GetRequestMethod(const RequestMethod &requestMethod)
 typedef DWORD (WINAPI *pCertNameToStrA)(DWORD dwCertEncodingType, PCERT_NAME_BLOB pName, DWORD dwStrType, LPSTR psz, DWORD csz);
 typedef void  (WINAPI *pCertFreeCertificateChain)(PCCERT_CHAIN_CONTEXT pChainContext);
 
+bool InetClient::ObtainCertificate(LPCTSTR lpszDomainName)
+{
+    if((m_hInternet = InternetOpenA(m_sUserAgent.c_str(), INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) == nullptr)
+    {
+        m_dwErr = GetLastError();
+        m_bConnected = false;
+    }
+    return true;
+}
+
 bool InetClient::SendRequest(const std::string &url,
                              std::string &response,
                              const RequestMethod requestMethod /*= RequestMethod::GET*/,
