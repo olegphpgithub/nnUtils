@@ -22,7 +22,9 @@ FormMutexUtility::~FormMutexUtility()
 void FormMutexUtility::CreateNamedMutex()
 {
     wchar_t *lpcwMutexName;
-    lpcwMutexName = new wchar_t[ui->mutexNameLineEdit->text().length() + 1];
+    uint32_t cchMutexName = ui->mutexNameLineEdit->text().length() + 1;
+    lpcwMutexName = new wchar_t[cchMutexName];
+    ZeroMemory(lpcwMutexName, cchMutexName * sizeof(wchar_t));
     ui->mutexNameLineEdit->text().toWCharArray(lpcwMutexName);
     m_hMutex = ::CreateMutexW(NULL, FALSE, lpcwMutexName);
     ui->createMutexPushButton->setEnabled(false);
