@@ -68,9 +68,6 @@ void FormFileUtility::LockFile()
 
     if(m_hFile == nullptr)
     {
-        ui->chooseFileLineEdit->setEnabled(false);
-        ui->chooseFileToolButton->setEnabled(false);
-
         wchar_t lpszFileName[MAX_PATH] = {0};
         fileName.toWCharArray(lpszFileName);
         m_hFile = ::CreateFileW(
@@ -99,6 +96,8 @@ void FormFileUtility::LockFile()
             if(OK)
             {
                 ui->lockFilePushButton->setText(tr("Unlock file"));
+                ui->chooseFileLineEdit->setEnabled(false);
+                ui->chooseFileToolButton->setEnabled(false);
                 return;
             }
             else
@@ -106,6 +105,13 @@ void FormFileUtility::LockFile()
                 ::CloseHandle(m_hFile);
                 m_hFile = nullptr;
             }
+        }
+        else
+        {
+            QMessageBox::critical(this,
+                                  tr("Critical error"),
+                                  tr("Could not lock file."),
+                                  QMessageBox::Cancel);
         }
     } else {
         ::CloseHandle(m_hFile);
