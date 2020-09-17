@@ -29,6 +29,7 @@
     </property>
     <addaction name="actionLockFileUtility"/>
     <addaction name="actionADSEditor"/>
+    <addaction name="actionCreateMutex"/>
    </widget>
    <widget class="QMenu" name="menuDomainUtilities">
     <property name="title">
@@ -58,6 +59,11 @@
   <action name="actionCheckDomainUtility">
    <property name="text">
     <string>Check domain utility</string>
+   </property>
+  </action>
+  <action name="actionCreateMutex">
+   <property name="text">
+    <string>Create mutex</string>
    </property>
   </action>
  </widget>
