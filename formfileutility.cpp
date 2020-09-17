@@ -1,5 +1,6 @@
 #include "formfileutility.h"
 #include "ui_formfileutility.h"
+#include "CppException.h"
 
 #include <QtGui>
 #include <QMessageBox>
@@ -98,7 +99,6 @@ void FormFileUtility::LockFile()
                 ui->lockFilePushButton->setText(tr("Unlock file"));
                 ui->chooseFileLineEdit->setEnabled(false);
                 ui->chooseFileToolButton->setEnabled(false);
-                return;
             }
             else
             {
@@ -108,16 +108,18 @@ void FormFileUtility::LockFile()
         }
         else
         {
-            QMessageBox::critical(this,
-                                  tr("Critical error"),
-                                  tr("Could not lock file."),
-                                  QMessageBox::Cancel);
+            m_hFile = nullptr;
+            DWORD dwLastError = GetLastError();
+            QString lastError = QString::fromStdWString(CppException::GetFormatMessage(dwLastError));
+            QMessageBox messageBox(QMessageBox::Critical, QString(tr("Critical error")), tr("Could not lock file."), QMessageBox::Cancel);
+            messageBox.setDetailedText(lastError);
+            messageBox.exec();
         }
     } else {
         ::CloseHandle(m_hFile);
-        ui->lockFilePushButton->setText(tr("Lock file"));
         m_hFile = nullptr;
 
+        ui->lockFilePushButton->setText(tr("Lock file"));
         ui->chooseFileLineEdit->setEnabled(true);
         ui->chooseFileToolButton->setEnabled(true);
     }
