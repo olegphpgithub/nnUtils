@@ -48,10 +48,19 @@ void FormFileUtility::LockFile()
 {
     QString fileName = ui->chooseFileLineEdit->text();
 
+    if(fileName.isNull() || fileName.isEmpty())
+    {
+        QMessageBox::critical(this,
+                              tr("User error"),
+                              tr("The file name must be specified."),
+                              QMessageBox::Cancel);
+        return;
+    }
+
     if(!QFileInfo::exists(fileName))
     {
         QMessageBox::critical(this,
-                              tr("Critical error"),
+                              tr("User error"),
                               tr("File was not found."),
                               QMessageBox::Cancel);
         return;
@@ -59,6 +68,9 @@ void FormFileUtility::LockFile()
 
     if(m_hFile == nullptr)
     {
+        ui->chooseFileLineEdit->setEnabled(false);
+        ui->chooseFileToolButton->setEnabled(false);
+
         wchar_t lpszFileName[MAX_PATH] = {0};
         fileName.toWCharArray(lpszFileName);
         m_hFile = ::CreateFileW(
@@ -99,5 +111,8 @@ void FormFileUtility::LockFile()
         ::CloseHandle(m_hFile);
         ui->lockFilePushButton->setText(tr("Lock file"));
         m_hFile = nullptr;
+
+        ui->chooseFileLineEdit->setEnabled(true);
+        ui->chooseFileToolButton->setEnabled(true);
     }
 }
