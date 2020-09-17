@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     connect(ui->actionLockFileUtility, SIGNAL(triggered()), this, SLOT(DisplayLockFileUtility()));
+    connect(ui->actionCreateMutex, SIGNAL(triggered()), this, SLOT(DisplayMutexUtility()));
     connect(ui->actionADSEditor, SIGNAL(triggered()), this, SLOT(DisplayAlternateDataStreamEditor()));
     connect(ui->actionCheckDomainUtility, SIGNAL(triggered()), this, SLOT(DisplayDomainInspector()));
 

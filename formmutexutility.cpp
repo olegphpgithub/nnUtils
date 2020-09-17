@@ -10,7 +10,7 @@ FormMutexUtility::FormMutexUtility(QWidget *parent) :
     connect(ui->createMutexPushButton,
             SIGNAL(pressed()),
             this,
-            SLOT(CreateMutex())
+            SLOT(CreateNamedMutex())
             );
 }
 
