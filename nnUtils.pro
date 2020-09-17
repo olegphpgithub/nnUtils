@@ -25,6 +25,7 @@ SOURCES += \
     fileutility.cpp \
     formdomaininspector.cpp \
     formfileutility.cpp \
+    formmutexutility.cpp \
     formstreameditor.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     fileutility.h \
     formdomaininspector.h \
     formfileutility.h \
+    formmutexutility.h \
     formstreameditor.h \
     mainwindow.h \
     treeitem.h \
@@ -49,6 +51,7 @@ HEADERS += \
 FORMS += \
     formdomaininspector.ui \
     formfileutility.ui \
+    formmutexutility.ui \
     formstreameditor.ui \
     mainwindow.ui
 
