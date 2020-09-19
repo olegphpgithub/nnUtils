@@ -18,11 +18,16 @@ public:
     ~FormMutexUtility();
 
 public slots:
+    void log(QString logString);
     void CreateNamedMutex();
+    void OpenNamedMutex();
+    void OwnershipMutex();
+    void ReleaseNamedMutex();
 
 private:
     Ui::FormMutexUtility *ui;
     HANDLE m_hMutex;
+    HANDLE m_hSemaphore;
 };
 
 #endif // FORMMUTEXUTILITY_H
