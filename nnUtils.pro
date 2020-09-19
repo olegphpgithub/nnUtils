@@ -22,6 +22,7 @@ SOURCES += \
     DomainUtilities/InetClient.cpp \
     DomainUtilities/TinyAES.cpp \
     DomainUtilities/URLCipher.cpp \
+    MutexUtilities/OwnershipMutexThread.cpp \
     fileutility.cpp \
     formdomaininspector.cpp \
     formfileutility.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
     DomainUtilities/InetClient.h \
     DomainUtilities/TinyAES.h \
     DomainUtilities/URLCipher.h \
+    MutexUtilities/OwnershipMutexThread.h \
     fileutility.h \
     formdomaininspector.h \
     formfileutility.h \
