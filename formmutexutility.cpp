@@ -128,6 +128,7 @@ void FormMutexUtility::CloseNamedMutex()
 void FormMutexUtility::OwnershipMutex()
 {
     ui->ownershipMutexPushButton->setEnabled(false);
+    ui->CloseMutexPushButton->setEnabled(false);
     m_hSemaphore = CreateMutexW(NULL, TRUE, NULL);
     OwnershipMutexThread *thread = new OwnershipMutexThread(this);
     connect(thread, SIGNAL(submitLog(QString)), this, SLOT(log(QString)));
@@ -152,6 +153,7 @@ void FormMutexUtility::OwnershipGotten(bool result)
 
 void FormMutexUtility::ReleaseNamedMutex()
 {
+    ui->CloseMutexPushButton->setEnabled(true);
     ui->ownershipMutexPushButton->setEnabled(true);
     ui->releaseMutexPushButton->setEnabled(false);
     ReleaseMutex(m_hSemaphore);
