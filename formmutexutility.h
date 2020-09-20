@@ -21,6 +21,7 @@ public slots:
     void log(QString logString);
     void CreateNamedMutex();
     void OpenNamedMutex();
+    void CloseNamedMutex();
     void OwnershipMutex();
     void ReleaseNamedMutex();
     void OwnershipGotten(bool result);

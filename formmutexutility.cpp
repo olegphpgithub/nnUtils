@@ -24,6 +24,12 @@ FormMutexUtility::FormMutexUtility(QWidget *parent) :
             SLOT(OpenNamedMutex())
             );
 
+    connect(ui->CloseMutexPushButton,
+            SIGNAL(pressed()),
+            this,
+            SLOT(CloseNamedMutex())
+            );
+
     connect(ui->ownershipMutexPushButton,
             SIGNAL(pressed()),
             this,
@@ -52,16 +58,31 @@ void FormMutexUtility::log(QString logString)
 
 void FormMutexUtility::CreateNamedMutex()
 {
-    ui->createMutexPushButton->setEnabled(false);
-    ui->ownershipMutexPushButton->setEnabled(true);
-    ui->releaseMutexPushButton->setEnabled(false);
+
     wchar_t *lpcwMutexName;
     uint32_t cchMutexName = ui->mutexNameLineEdit->text().length() + 1;
     lpcwMutexName = new wchar_t[cchMutexName];
     ZeroMemory(lpcwMutexName, cchMutexName * sizeof(wchar_t));
     ui->mutexNameLineEdit->text().toWCharArray(lpcwMutexName);
     m_hMutex = ::CreateMutexW(NULL, FALSE, lpcwMutexName);
-    ui->createMutexPushButton->setEnabled(false);
+    DWORD dwLastError = GetLastError();
+    if (dwLastError != ERROR_SUCCESS)
+    {
+        m_hMutex = NULL;
+        QString lastError = QString::fromStdWString(CppException::GetFormatMessage(dwLastError));
+        QMessageBox messageBox(QMessageBox::Critical, QString(tr("Critical error")), tr("Could not open named mutex."), QMessageBox::Cancel);
+        messageBox.setDetailedText(lastError);
+        messageBox.exec();
+    }
+    else
+    {
+        log("Mutex was created succussfully");
+        ui->createMutexPushButton->setEnabled(false);
+        ui->openMutexPushButton->setEnabled(false);
+        ui->CloseMutexPushButton->setEnabled(true);
+        ui->ownershipMutexPushButton->setEnabled(true);
+        ui->releaseMutexPushButton->setEnabled(false);
+    }
     delete []lpcwMutexName;
 }
 
@@ -75,7 +96,7 @@ void FormMutexUtility::OpenNamedMutex()
     m_hMutex = ::OpenMutexW(SYNCHRONIZE, FALSE, lpcwMutexName);
 
     DWORD dwLastError = GetLastError();
-    if(dwLastError != ERROR_SUCCESS)
+    if (dwLastError != ERROR_SUCCESS)
     {
         m_hMutex = NULL;
         QString lastError = QString::fromStdWString(CppException::GetFormatMessage(dwLastError));
@@ -83,14 +104,25 @@ void FormMutexUtility::OpenNamedMutex()
         messageBox.setDetailedText(lastError);
         messageBox.exec();
     }
-
-    if(m_hMutex != INVALID_HANDLE_VALUE)
+    else
     {
         log("Mutex was opened succussfully");
         ui->createMutexPushButton->setEnabled(false);
+        ui->openMutexPushButton->setEnabled(false);
+        ui->CloseMutexPushButton->setEnabled(true);
         ui->ownershipMutexPushButton->setEnabled(true);
         ui->releaseMutexPushButton->setEnabled(false);
     }
+}
+
+void FormMutexUtility::CloseNamedMutex()
+{
+    CloseHandle(m_hMutex);
+    ui->createMutexPushButton->setEnabled(true);
+    ui->openMutexPushButton->setEnabled(true);
+    ui->CloseMutexPushButton->setEnabled(false);
+    ui->ownershipMutexPushButton->setEnabled(false);
+    ui->releaseMutexPushButton->setEnabled(false);
 }
 
 void FormMutexUtility::OwnershipMutex()
