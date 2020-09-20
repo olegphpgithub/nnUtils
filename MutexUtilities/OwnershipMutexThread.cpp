@@ -11,6 +11,7 @@ void OwnershipMutexThread::run()
 {
     emit submitLog("Please wait...");
     DWORD dwWaitResult = WaitForSingleObject(m_hMutex, INFINITE);
+    emit submitResult(true);
 
     switch (dwWaitResult)
     {
@@ -33,7 +34,7 @@ void OwnershipMutexThread::run()
 
     case WAIT_ABANDONED:
         emit submitLog("The thread got ownership of an abandoned mutex");
-
+        emit submitResult(false);
     }
 
 }

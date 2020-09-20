@@ -23,6 +23,7 @@ public slots:
     void OpenNamedMutex();
     void OwnershipMutex();
     void ReleaseNamedMutex();
+    void OwnershipGotten(bool result);
 
 private:
     Ui::FormMutexUtility *ui;
