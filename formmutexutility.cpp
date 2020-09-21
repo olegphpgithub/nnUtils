@@ -58,7 +58,6 @@ void FormMutexUtility::log(QString logString)
 
 void FormMutexUtility::CreateNamedMutex()
 {
-
     wchar_t *lpcwMutexName;
     uint32_t cchMutexName = ui->mutexNameLineEdit->text().length() + 1;
     lpcwMutexName = new wchar_t[cchMutexName];
@@ -77,6 +76,7 @@ void FormMutexUtility::CreateNamedMutex()
     else
     {
         log("Mutex was created succussfully");
+        ui->mutexNameLineEdit->setEnabled(false);
         ui->createMutexPushButton->setEnabled(false);
         ui->openMutexPushButton->setEnabled(false);
         ui->CloseMutexPushButton->setEnabled(true);
@@ -107,6 +107,7 @@ void FormMutexUtility::OpenNamedMutex()
     else
     {
         log("Mutex was opened succussfully");
+        ui->mutexNameLineEdit->setEnabled(false);
         ui->createMutexPushButton->setEnabled(false);
         ui->openMutexPushButton->setEnabled(false);
         ui->CloseMutexPushButton->setEnabled(true);
@@ -118,6 +119,7 @@ void FormMutexUtility::OpenNamedMutex()
 void FormMutexUtility::CloseNamedMutex()
 {
     CloseHandle(m_hMutex);
+    ui->mutexNameLineEdit->setEnabled(true);
     ui->createMutexPushButton->setEnabled(true);
     ui->openMutexPushButton->setEnabled(true);
     ui->CloseMutexPushButton->setEnabled(false);
