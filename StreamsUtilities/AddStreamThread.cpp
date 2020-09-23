@@ -10,6 +10,7 @@ AddStreamThread::AddStreamThread(QObject *parent) : QThread(parent)
 
 void AddStreamThread::run()
 {
+    emit submitLog("Please wait...");
     QStringList fileStringList = getFilesListToProcess();
     for (int i = 0; i < fileStringList.size(); i++) {
         QString filePathString(fileStringList.at(1));
