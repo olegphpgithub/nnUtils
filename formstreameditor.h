@@ -16,6 +16,7 @@ public:
     ~FormStreamEditor();
 
 public slots:
+    void log(QString logString);
     void ChoosePathToExeFiles();
     void AddStream();
 

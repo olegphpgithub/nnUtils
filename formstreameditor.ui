@@ -45,7 +45,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPlainTextEdit" name="protocolPlainTextEdit"/>
+      <widget class="QTextEdit" name="resultTextEdit"/>
      </item>
     </layout>
    </item>

@@ -23,6 +23,7 @@ SOURCES += \
     DomainUtilities/TinyAES.cpp \
     DomainUtilities/URLCipher.cpp \
     MutexUtilities/OwnershipMutexThread.cpp \
+    StreamsUtilities/AddStreamThread.cpp \
     fileutility.cpp \
     formdomaininspector.cpp \
     formfileutility.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     DomainUtilities/TinyAES.h \
     DomainUtilities/URLCipher.h \
     MutexUtilities/OwnershipMutexThread.h \
+    StreamsUtilities/AddStreamThread.h \
     fileutility.h \
     formdomaininspector.h \
     formfileutility.h \
