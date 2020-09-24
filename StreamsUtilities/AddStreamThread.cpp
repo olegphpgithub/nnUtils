@@ -13,7 +13,7 @@ void AddStreamThread::run()
     emit submitLog("Please wait...");
     QStringList fileStringList = getFilesListToProcess();
     for (int i = 0; i < fileStringList.size(); i++) {
-        QString filePathString(fileStringList.at(0));
+        QString filePathString(fileStringList.at(i));
         QString fileStreamNameString("%1:%2");
         fileStreamNameString =
                 fileStreamNameString.arg(fileStringList.at(i));
