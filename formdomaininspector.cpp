@@ -53,6 +53,8 @@ void FormDomainInspector::ValidateDomain()
     domainInspector->m_DomainName = ui->domainNameLineEdit->text();
     domainInspector->m_DomainKey = ui->domainKeyLineEdit->text();
     domainInspector->m_DomainOffset = ui->domainOffsetSpinBox->value();
+    domainInspector->m_encodeMethod = DomainInspector::HEX;
+    domainInspector->m_messageFormat = DomainInspector::SHORT;
     QObject::connect(domainInspector, SIGNAL(progress(TreeItem*)), this, SLOT(progress(TreeItem*)));
     QObject::connect(domainInspector, SIGNAL(finished()), domainInspector, SLOT(deleteLater()));
     domainInspector->start();

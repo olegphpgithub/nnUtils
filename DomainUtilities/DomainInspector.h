@@ -18,6 +18,16 @@ public:
     QString m_DomainKey;
     unsigned int m_DomainOffset = 0;
 
+    enum EncodeMethod {
+        HEX,
+        BASE64
+    } m_encodeMethod;
+
+    enum MessageFormat {
+        SCRIPT,
+        SHORT,
+    } m_messageFormat;
+
 signals:
     void progress(TreeItem *status);
 };

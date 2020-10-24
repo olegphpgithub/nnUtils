@@ -17,49 +17,107 @@
    <item>
     <layout class="QVBoxLayout" name="centralWidget">
      <item>
-      <widget class="QLabel" name="domainNameLabel">
-       <property name="text">
-        <string>Domain name</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="domainNameLineEdit">
-       <property name="text">
-        <string>getapphello.com</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="domainKeyLabel">
-       <property name="text">
-        <string>Domain key</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="domainKeyLineEdit">
-       <property name="text">
-        <string>F50CD6B7031DF497A62A5DF56D6DE</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="domainOffsetLabel">
-       <property name="text">
-        <string>Domain offset</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="domainOffsetSpinBox">
-       <property name="maximum">
-        <number>99999999</number>
-       </property>
-       <property name="value">
-        <number>234234</number>
-       </property>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="2" column="1">
+        <widget class="QSpinBox" name="domainOffsetSpinBox">
+         <property name="maximum">
+          <number>99999999</number>
+         </property>
+         <property name="value">
+          <number>234234</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="comboBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <item>
+          <property name="text">
+           <string>STD (Hex)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>SCB (Base64)</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="EncodeMethodLabel">
+         <property name="text">
+          <string>Encode method</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="domainKeyLabel">
+         <property name="text">
+          <string>Domain key</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="comboBox_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <item>
+          <property name="text">
+           <string>STD (F=1&amp;T=1&amp;NT=%s&amp;N=%s)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>SCB (script=installer.php&amp;CODE=PUTGQ&amp;quant=%s&amp;action=%s)</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="MessageFormatLabel">
+         <property name="text">
+          <string>Message format</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="domainOffsetLabel">
+         <property name="text">
+          <string>Domain offset</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="domainKeyLineEdit">
+         <property name="text">
+          <string>F50CD6B7031DF497A62A5DF56D6DE</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="domainNameLineEdit">
+         <property name="text">
+          <string>getapphello.com</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="domainNameLabel">
+         <property name="text">
+          <string>Domain name</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="QPushButton" name="validateDomainPushButton">
