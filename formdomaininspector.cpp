@@ -39,6 +39,12 @@ FormDomainInspector::FormDomainInspector(QWidget *parent) :
     textDocument.setDefaultTextOption(option);
     textDocument.setDefaultFont(QFont(QString("Courier New")));
     ui->resultTextEdit->setDocument(&textDocument);
+
+    ui->encodeMethodComboBox->addItem("STD (Hex)", DomainInspector::HEX);
+    ui->encodeMethodComboBox->addItem("SCB (Base64)", DomainInspector::BASE64);
+
+    ui->messageFormatComboBox->addItem("STD (F=1&T=1&NT=%s&N=%s)", DomainInspector::SHORT);
+    ui->messageFormatComboBox->addItem("SCB (script=installer.php&CODE=PUTGQ&quant=%s&action=%s)", DomainInspector::SCRIPT);
 }
 
 FormDomainInspector::~FormDomainInspector()
@@ -53,7 +59,7 @@ void FormDomainInspector::ValidateDomain()
     domainInspector->m_DomainName = ui->domainNameLineEdit->text();
     domainInspector->m_DomainKey = ui->domainKeyLineEdit->text();
     domainInspector->m_DomainOffset = ui->domainOffsetSpinBox->value();
-    domainInspector->m_encodeMethod = DomainInspector::HEX;
+    domainInspector->m_encodeMethod = static_cast<DomainInspector::EncodeMethod>(ui->encodeMethodComboBox->currentData().toInt());
     domainInspector->m_messageFormat = DomainInspector::SHORT;
     QObject::connect(domainInspector, SIGNAL(progress(TreeItem*)), this, SLOT(progress(TreeItem*)));
     QObject::connect(domainInspector, SIGNAL(finished()), domainInspector, SLOT(deleteLater()));
