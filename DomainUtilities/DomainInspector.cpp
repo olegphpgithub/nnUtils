@@ -1,6 +1,7 @@
 #include "DomainInspector.h"
 #include "treeitem.h"
 #include "InetClient.h"
+#include "Base64.h"
 #include "../CppException.h"
 
 #include <tchar.h>
@@ -23,11 +24,6 @@ void DomainInspector::run()
     columnData.clear();
     columnData << "Generate Quant" << "OK";
     TreeItem *root = new TreeItem(columnData);
-
-//    InetClient ic;
-//    ic.m_DomainName.assign(m_DomainName.toLocal8Bit());
-//    ic.m_DomainKey.assign(m_DomainKey.toLocal8Bit());
-//    ic.m_DomainOffset = m_DomainOffset;
 
     try {
 
@@ -159,7 +155,15 @@ void DomainInspector::ProcessURL(char *url)
             {
                 str.erase(0, 2);
                 m_action = str;
-                CreateRawUrl(url, "F=1&T=1&NT=%s&N=%s", str.c_str());
+                switch(m_messageFormat)
+                {
+                case SHORT:
+                    CreateRawUrl(url, "F=1&T=1&NT=%s&N=%s", str.c_str());
+                break;
+                case SCRIPT:
+                    CreateRawUrl(url, "script=installer.php&CODE=PUTGQ&quant=%s&action=%s", str.c_str());
+                break;
+                }
             } break;
         case 'b':
             {
@@ -273,9 +277,10 @@ void DomainInspector::CreateRawUrl(char *url, const char *tpl, const char *param
 
     m_RequestPlain.assign(szPureURL);
 
-    std::string strQueryEncrypted = URLCipher::WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
-                                                              cbPureURL,
-                                                              m_DomainKey.toLocal8Bit().data());
+    std::string strQueryEncrypted = WrapperEncrypt(reinterpret_cast<unsigned char*>(szPureURL),
+                                                   cbPureURL,
+                                                   m_DomainKey.toLocal8Bit().data(),
+                                                   m_encodeMethod);
 
     std::string strURI = "https://";
     strURI += m_DomainName.toLocal8Bit().data();
@@ -600,4 +605,97 @@ std::string DomainInspector::GetRequestMethod(const RequestMethod &requestMethod
     }
 
     return "";
+}
+
+std::string DomainInspector::WrapperEncrypt(const unsigned char *secure_data,
+                                            const uint32_t secure_len,
+                                            const char *secret_key,
+                                            EncodeMethod enc_method)
+{
+    TinyAES aes;
+
+    uint32_t size_aligned = secure_len + 15;
+    size_aligned = size_aligned / 16;
+    size_aligned = size_aligned * 16;
+    uint8_t *inbuff = new uint8_t[size_aligned];
+    memset(inbuff, 0x0, size_aligned);
+    memcpy_s(inbuff, size_aligned, secure_data, secure_len);
+
+    TinyAES::AES_ctx ctx;
+    uint8_t key[32] = {0};
+    uint8_t iv[16] = {0};
+
+    memcpy_s(key, strlen(secret_key), secret_key, strlen(secret_key));
+    aes.AES_init_ctx_iv(&ctx, key, iv);
+    SecureZeroMemory(key, 32);
+
+    for (uint32_t i = 0; i < size_aligned; i+= 16)
+    {
+        aes.AES_CBC_encrypt_buffer(&ctx, inbuff + i, 16);
+    }
+    SecureZeroMemory(ctx.RoundKey, sizeof(ctx.RoundKey));
+    SecureZeroMemory(ctx.Iv, sizeof(ctx.Iv));
+
+    std::string encoded_data;
+
+    if(enc_method == BASE64)
+    {
+        uint32_t encrypted_data_size = size_aligned + 16;
+        unsigned char *encrypted_data = new unsigned char[encrypted_data_size];
+
+        memcpy_s(encrypted_data, encrypted_data_size, iv, 16);
+        memcpy_s(encrypted_data + 16, encrypted_data_size, inbuff, size_aligned);
+
+        encoded_data = URLEncode(Base64::base64_encode(encrypted_data, size_aligned + 16));
+    }
+    else
+    {
+        char hexBuff[0x3];
+        for (uint32_t i = 0; i < 16; i++)
+        {
+            sprintf_s(hexBuff, "%.2X", iv[i]);
+            encoded_data.append(hexBuff);
+        }
+        for (uint32_t i = 0; i < size_aligned; i++)
+        {
+            sprintf_s(hexBuff, "%.2X", inbuff[i]);
+            encoded_data.append(hexBuff);
+        }
+    }
+
+    delete [] inbuff;
+    return encoded_data;
+}
+
+std::string DomainInspector::URLEncode(const std::string &value)
+{
+    const TCHAR DEC2HEX[16 + 1] = _T("0123456789ABCDEF");
+
+    std::string escaped = "";
+
+    for(unsigned int i = 0; i < value.length(); i++)
+    {
+        if( value[i] == _T('%') || value[i] == _T('$') || value[i] == _T('&') || value[i] == _T('+') || value[i] == _T(',')  ||
+            value[i] == _T('/') || value[i] == _T(':') || value[i] == _T('[') || value[i] == _T(']') || value[i] == _T('\\') ||
+            value[i] == _T(';') || value[i] == _T('=') || value[i] == _T('?') || value[i] == _T('@') || value[i] == _T('#')  ||
+            value[i] < 0x20 || value[i] > 0x7E )
+        {
+            escaped += _T('%');
+            escaped += DEC2HEX[ (value[i] >> 4) & 0x0F];
+            escaped += DEC2HEX[ value[i] & 0x0F];
+        }
+        else
+        {
+            if( value[i] == _T(' '))
+            {
+                escaped += _T('+');
+            }
+            else
+            {
+                escaped += value[i];
+            }
+        }
+    }
+
+    return escaped;
 }

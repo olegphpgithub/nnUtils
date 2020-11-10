@@ -72,7 +72,11 @@ public:
     bool Disconnect();
     bool ParseURL(const std::string &url, Scheme &scheme, std::string &host, unsigned int &port, std::string &query);
     void CreateRawUrl(char *url, const char *tpl, const char *param);
-
+    static std::string WrapperEncrypt(const unsigned char *secure_data,
+                                      const uint32_t secure_len,
+                                      const char *secret_key,
+                                      EncodeMethod enc_method);
+    static std::string URLEncode(const std::string &value);
     unsigned int	GetDefaultPort(const Scheme &scheme);
     std::string		GetRequestMethod(const RequestMethod &requestMethod);
 
