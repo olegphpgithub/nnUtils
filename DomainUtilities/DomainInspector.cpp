@@ -14,7 +14,7 @@
 
 DomainInspector::DomainInspector()
 {
-    m_sUserAgent.assign("NSIS_Inetc (Mozilla)");
+    m_UserAgent = "NSIS_Inetc (Mozilla)";
     m_quant = "0";
 }
 
@@ -56,7 +56,7 @@ void DomainInspector::run()
     }
 
     columnData.clear();
-    columnData << "Encrypted request" << QString::fromLocal8Bit(m_RequestEncrypted.c_str());
+    columnData << "Encrypted request" << m_RequestEncrypted;
     root->appendChild(new TreeItem(columnData));
 
     columnData.clear();
@@ -171,7 +171,7 @@ std::string DomainInspector::SendReport(int id)
 
     sprintf_s(url, 1024, "%s", strURI.c_str());
 
-    m_RequestEncrypted.assign(url);
+    m_RequestEncrypted = QString::fromLocal8Bit(url);
 
     if (!SendRequest(url, response, RequestMethod::GET, "", false))
     {
@@ -331,7 +331,7 @@ bool DomainInspector::Connect(const std::string &host, int port, DWORD dwAccessT
     // INTERNET_OPEN_TYPE_PRECONFIG - retrieves the proxy or direct configuration from the registry.
     // After the calling application has finished using the HINTERNET handle returned by InternetOpen, it must be closed using the InternetCloseHandle function.
     // Like all other aspects of the WinINet API, this function cannot be safely called from within DllMain or the constructors and destructors of global objects.
-    if((m_hInternet = InternetOpenA(m_sUserAgent.c_str(), dwAccessType, nullptr, nullptr, 0)) == nullptr)
+    if((m_hInternet = InternetOpenA(m_UserAgent.toLocal8Bit(), dwAccessType, nullptr, nullptr, 0)) == nullptr)
     {
         m_dwErr = GetLastError();
         m_bConnected = false;

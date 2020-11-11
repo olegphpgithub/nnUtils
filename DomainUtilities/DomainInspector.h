@@ -27,7 +27,7 @@ public:
     HINTERNET		m_hInternet;
     HINTERNET		m_hSession;
     DWORD			m_dwErr;
-    std::string		m_sUserAgent;
+    QString m_UserAgent;
     bool			m_bConnected;
 
     enum Scheme
@@ -56,7 +56,7 @@ public:
     std::string m_quant;
     std::string m_RND;
     std::string m_RequestPlain;
-    std::string m_RequestEncrypted;
+    QString m_RequestEncrypted;
     std::string m_Response;
 
     std::string SendReport(int id);
