@@ -65,13 +65,11 @@ public:
                                  const RequestMethod requestMethod /*= RequestMethod::GET*/,
                                  const std::string &postData /*= _T("")*/,
                                  bool bGetSSLCert /*= false*/);
-    void ProcessURL(char *url);
     bool Connect(const std::string &host,
                              int port = INTERNET_DEFAULT_HTTP_PORT,
                              DWORD dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG);
     bool Disconnect();
     bool ParseURL(const std::string &url, Scheme &scheme, std::string &host, unsigned int &port, std::string &query);
-    void CreateRawUrl(char *url, const char *tpl, const char *param);
     static std::string WrapperEncrypt(const unsigned char *secure_data,
                                       const uint32_t secure_len,
                                       const char *secret_key,

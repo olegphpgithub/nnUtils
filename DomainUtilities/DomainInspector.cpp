@@ -129,139 +129,18 @@ std::string DomainInspector::SendReport(int id)
 {
     std::string response;
     char url[1024] = { 0 };
+    char tpl[1024] = { 0 };
 
-    sprintf_s(url, "a:%i", id);
-
-    ProcessURL(url);
-
-    m_RequestEncrypted.assign(url);
-
-    if (!SendRequest(url, response, RequestMethod::GET, "", false))
+    switch (m_messageFormat)
     {
-        response = "error";
+    case SHORT:
+        strcpy_s(tpl, "F=1&T=1&NT=%d&N=%d");
+    break;
+    case SCRIPT:
+        strcpy_s(tpl, "script=installer.php&CODE=PUTGQ&quant=%d&action=%d");
+    break;
     }
 
-    return response;
-}
-
-void DomainInspector::ProcessURL(char *url)
-{
-    std::string str = url;
-
-    switch (url[0])
-    {
-        case 'a':
-            if (str.find("a:") == 0)
-            {
-                str.erase(0, 2);
-                m_action = str;
-                switch(m_messageFormat)
-                {
-                case SHORT:
-                    CreateRawUrl(url, "F=1&T=1&NT=%s&N=%s", str.c_str());
-                break;
-                case SCRIPT:
-                    CreateRawUrl(url, "script=installer.php&CODE=PUTGQ&quant=%s&action=%s", str.c_str());
-                break;
-                }
-            } break;
-        case 'b':
-            {
-                if (str.find("b:") == 0)
-                {
-                    str.erase(0, 2);
-                    CreateRawUrl(url, "%sscript=ipb.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
-                }
-            } break;
-        case 'p':
-            {
-                if (str.find("p3:") == 0)
-                {
-                    str.erase(0,3);
-                    CreateRawUrl(url, "%sscript=postdata3.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
-                }
-                else
-                {
-                    if (str.find("p4:") == 0)
-                    {
-                        str.erase(0, 3);
-                        CreateRawUrl(url, "%sscript=postdata4.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
-                    }
-                    else
-                    {
-                        if (str.find("px:") == 0)
-                        {
-                            str.erase(0, 3);
-                            CreateRawUrl(url, "%sscript=pixel.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
-                        }
-                        else
-                        {
-                            if (str.find("pf:") == 0)
-                            {
-                                CreateRawUrl(url, "%sscript=fuse.php&UID=%s&quant=%s&%s&rnd=%s", "");
-                            }
-                            else
-                            {
-                                if (str.find("pt:") == 0)
-                                {
-                                    CreateRawUrl(url, "%sscript=posttest.php&UID=%s&quant=%s&%s&rnd=%s", "");
-                                }
-                                else
-                                {
-                                    if (str.find("pa:") == 0)
-                                    {
-                                        CreateRawUrl(url, "%sscript=addr.php&UID=%s&quant=%s&%s&rnd=%s", "");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } break;
-        case 'f':
-            {
-                if (str.find("f:") == 0)
-                {
-                    str.erase(0, 2);
-                    CreateRawUrl(url, "%sscript=optin.php&UID=%s&quant=%s&f=%s&rnd=%s", str.c_str());
-                }
-
-            } break;
-        case 'm':
-            {
-                if (str.find("m:") == 0)
-                {
-                    str.erase(0, 2);
-                    CreateRawUrl(url, "%sscript=info.php&UID=%s&quant=%s&%s&rnd=%s", str.c_str());
-                }
-
-            } break;
-        case 'c':
-            {
-                if ( str.find("c3:") == 0)
-                {
-                    CreateRawUrl(url, "%sscript=cf3.php&UID=%s&quant=%s&%s&rnd=%s", "");
-                }
-            } break;
-        case 'r':
-            {
-
-                if ( str.find("rk1:") == 0)
-                {
-                    CreateRawUrl(url, "%sscript=relevant.exe&UID=%s&quant=%s&%s&rnd=%s", "");
-                }
-            } break;
-    }
-
-    for (unsigned int i = 0; i < str.length(); i++)
-    {
-        str[i] = 0;
-    }
-
-}
-
-void DomainInspector::CreateRawUrl(char *url, const char *tpl, const char *param)
-{
     char szPureURL[2048];
     size_t cbPureURL = 0;
 
@@ -269,8 +148,8 @@ void DomainInspector::CreateRawUrl(char *url, const char *tpl, const char *param
         szPureURL,
         2048,
         tpl,
-        m_quant.c_str(),
-        param
+        0,
+        id
     );
 
     cbPureURL = strlen(szPureURL);
@@ -290,6 +169,14 @@ void DomainInspector::CreateRawUrl(char *url, const char *tpl, const char *param
 
     sprintf_s(url, 1024, "%s", strURI.c_str());
 
+    m_RequestEncrypted.assign(url);
+
+    if (!SendRequest(url, response, RequestMethod::GET, "", false))
+    {
+        response = "error";
+    }
+
+    return response;
 }
 
 bool DomainInspector::SendRequest(const std::string &url,
