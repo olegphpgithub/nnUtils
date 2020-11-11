@@ -1,7 +1,7 @@
 #include "DomainInspector.h"
 #include "treeitem.h"
-#include "InetClient.h"
 #include "Base64.h"
+#include "TinyAES.h"
 #include "../CppException.h"
 
 #include <tchar.h>
@@ -9,6 +9,8 @@
 
 #include <QModelIndex>
 #include <QDebug>
+
+#pragma comment(lib, "WinInet.lib")
 
 DomainInspector::DomainInspector()
 {
@@ -281,7 +283,7 @@ bool DomainInspector::SendRequest(const std::string &url,
 
     // Read response:
     bool   bFinished = false;
-    char   szResp[IC_TEMP_RESPONSE_BUF_SIZE];
+    char   szResp[1024];
     DWORD  dwBytesRead = 0;
     response.clear();
 

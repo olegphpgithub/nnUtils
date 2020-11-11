@@ -19,7 +19,6 @@ SOURCES += \
     CppException.cpp \
     DomainUtilities/Base64.cpp \
     DomainUtilities/DomainInspector.cpp \
-    DomainUtilities/InetClient.cpp \
     DomainUtilities/TinyAES.cpp \
     DomainUtilities/URLCipher.cpp \
     MutexUtilities/OwnershipMutexThread.cpp \
@@ -38,7 +37,6 @@ HEADERS += \
     CppException.h \
     DomainUtilities/Base64.h \
     DomainUtilities/DomainInspector.h \
-    DomainUtilities/InetClient.h \
     DomainUtilities/TinyAES.h \
     DomainUtilities/URLCipher.h \
     MutexUtilities/OwnershipMutexThread.h \

@@ -4,7 +4,6 @@
 #include "CppException.h"
 #include "treemodel.h"
 #include "treeitem.h"
-#include "DomainUtilities/InetClient.h"
 #include "DomainUtilities/DomainInspector.h"
 
 #include <QtWidgets>
